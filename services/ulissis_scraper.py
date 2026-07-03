@@ -15,6 +15,10 @@ reader.pages
 reader.pages[n].extract_text()
 '''
 
+def scrape_creature(url: str) -> Creature:
+    creature = Creature(source="regelwiki", source_url=url)
+    ...
+    return creature
 
 
 def find_creature_url(name: str) -> str | None:

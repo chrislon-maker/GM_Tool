@@ -1,56 +1,82 @@
+from dataclasses import dataclass, field
+from .resource import Resource
+from .weapon import Weapon
+from .status_effect import StatusEffect
 import numpy as np
 import random, re, inspect
 
 
-class Kreatur:
-    def __init__(self, link=None, lookfor="", **kwargs):
-        #super().__init__()
-        """
-        Character class: represents a character with its all stats.
+"""
+def lose_hp(self, amount: int):
+
+def heal(self, amount: int):
+    ...
+
+def add_status(self, status: str):
+    ...
+
+def remove_status(self, status: str):
+    ...
+
+def roll_initiative(self):
+    ...
+
+def make_skill_check(self, talent: str):
+    ...
+"""
+
+@dataclass
+class Creature:
+    name: str = ""
+
+    source: str | None = None
+    source_url: str | None = None
+
+    attributes: dict[str, int] = field(default_factory=dict)
+    resources: dict[str, Resource] = field(default_factory=dict)    # LeP, SaP, KaP, Schips
+    derived_values: dict[str, int | str] = field(default_factory=dict)  # SKm ZK, AW, INI, GS
+    talents: dict[str, int] = field(default_factory=dict)
+    status_effects: list[StatusEffect] = field(default_factory=list)
+
+    weapons: list[Weapon] = field(default_factory=list)
+    armor: list[dict] = field(default_factory=list)
+
+    advantages: list[str] = field(default_factory=list)
+    disadvantages: list[str] = field(default_factory=list)
+    special_abilities: list[str] = field(default_factory=list)
+
+    spells: dict[str, int] = field(default_factory=dict)
+    liturgies: dict[str, int] = field(default_factory=dict)
+
+    notes: str = ""
+
+    def get_attribute(self, name: str, default: int = 0) -> int:
+        return self.attributes.get(name, default)
+
+    def get_resource(self, name: str) -> Resource:
+        if name not in self.resources:
+            self.resources[name] = Resource()
+        return self.resources[name]
+
+    def lose_resource(self, name: str, amount: int) -> None:
+        self.get_resource(name).lose(amount)
+
+    def restore_resource(self, name: str, amount: int) -> None:
+        self.get_resource(name).restore(amount)
+
+    def lose_hp(self, amount: int) -> None:
+        self.lose_resource("LeP", amount)
+
+    def heal(self, amount: int) -> None:
+        self.restore_resource("LeP", amount)
+
+    def add_weapon(self, weapon: Weapon) -> None:
+        self.weapons.append(weapon)
+
+    def get_talent_value(self, name: str, default: int = 0) -> int:
+        return self.talents.get(name, default)
     
-        VARIABLES:
-            # CHARACTERISTICS
-            name (str) = full name
-            family (str) = family name
-            home (str) = location of birth
-            birthday (str) = date of birth
-            species (str) = species
-            size (str) = body height
-            hair (str) = hair color
-            eyes (str) = eye color
-            culture (str) = culture / origin
-            profession (str) = profession
-            social_status (str) = social status
-            gender (str) = gender
 
-            # ATTRIBUTES
-            MU (int) = Mut 
-            KL (int) = Klugheit
-            IN (int) = Intuition
-            CH (int) = Charisma
-            FF (int) = Fingerfertigkeit 
-            GE (int) = Geschicklichkeit
-            KO (int) = Konstitution
-            KK (int) = Körperkraft
-
-            # STATUS VALUES
-            LeP (int) = current hit points
-            maxLeP (int) = maximum hit points
-            AsP (int) = current astral points
-            maxAsP (int) = maximum astral points
-            KaP (int) = current karmal points 
-            maxKaP (int) = maximum karmal points 
-            SK (int) = Seelenkraft 
-            ZK (int) = Zähigkeit 
-            AW (int) = Ausweichen
-            INI (int) = Initiative 
-            schip (int) = aktuelle Schicksalspunkte
-            maxschip (int) = maximale Schicksalspunkte 
-            GS (int) = Geschwindigkeit 
-            statuus (dict{str:int})= aktive Statuseffecte und deren Stufe
-            disabled (bool) = gibt an ob der Charakter handlungsunfähig ist
-            dying (int) = gibt an wie viele KR der Charakter schon im sterben liegt
-        """
         self.statuus = {}
         self.disabled = False
         self.dying = False
@@ -61,14 +87,27 @@ class Kreatur:
         self.size = ''
 
         # attributes
-        self.MU = 8
-        self.KL = 8
-        self.IN = 8
-        self.CH = 8
-        self.FF = 8
-        self.GE = 8
-        self.KO = 8
-        self.KK = 8
+        self.attributes = {
+            "MU": 14,
+            "KL": 12,
+            "IN": 13,
+            "CH": 8,
+            "FF": 8,
+            "GE": 8,
+            "KO": 8,
+            "KK": 8
+        }
+
+        self.resources = {
+            "LeP": 32,
+            "AsP": 20,
+            "KaP": 0
+        }
+
+        self.skills = {
+            "Klettern": 8,
+            "Sinnesschärfe": 10
+        }
 
         # status values
         self.LeP = 20

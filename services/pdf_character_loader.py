@@ -15,6 +15,11 @@ reader.pages
 reader.pages[n].extract_text()
 '''
 
+def load_character_from_pdf(path: str) -> Creature:
+    creature = Creature(source="pdf")
+    ...
+    return creature
+
 
 class Character(Kreatur):
     def __init__(self, pdf_path, **kwargs):
