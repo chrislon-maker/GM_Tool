@@ -1,0 +1,33 @@
+{
+    "MU": 16,
+    "KL": 5,
+    "IN": 14,
+    "CH": 14,
+    "FF": 10,
+    "GE": 10,
+    "KO": 14,
+    "KK": 14,
+    "LeP": 5,
+    "maxLeP": 5,
+    "base_INI": 13,
+    "INI_bonus": "1W6",
+    "RS": 0,
+    "actions": 1,
+    "size": "",
+    "species": "Chim\u00e4re",
+    "loot": "keine",
+    "kampfverhalten": "Hundeblumen",
+    "name": "Hundeblume",
+    "AsP": 0,
+    "KaP": 0,
+    "maxAsP": 0,
+    "maxKaP": 0,
+    "talents": {
+        "Einsch\u00fcchtern": 2,
+        "Kraftakt": 6,
+        "Selbstbeherrschung": 5,
+        "Sinnessch\u00e4rfe": 12,
+        "Verbergen": 10,
+        "Willenskraft": 7
+    }
+}
