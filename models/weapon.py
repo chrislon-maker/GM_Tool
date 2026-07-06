@@ -9,7 +9,7 @@ class DamageBonus:
 @dataclass
 class Weapon:
     name: str = ""
-    damage_formula: str = ""
+    damage_formula: str = ""    # 2W6 + 4
     weight: float | None = None
     price: str | None = None
     complexity: str | None = None

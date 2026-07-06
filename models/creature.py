@@ -34,8 +34,9 @@ class Creature:
 
     attributes: dict[str, int] = field(default_factory=dict)
     resources: dict[str, Resource] = field(default_factory=dict)    # LeP, SaP, KaP, Schips
-    derived_values: dict[str, int | str] = field(default_factory=dict)  # SKm ZK, AW, INI, GS
+    derived_values: dict[str, int | str] = field(default_factory=dict)  # SK, ZK, AW, INI, GS
     talents: dict[str, int] = field(default_factory=dict)
+
     status_effects: list[StatusEffect] = field(default_factory=list)
 
     weapons: list[Weapon] = field(default_factory=list)
@@ -49,6 +50,19 @@ class Creature:
     liturgies: dict[str, int] = field(default_factory=dict)
 
     notes: str = ""
+
+    def status_level(self, status_type: type[StatusEffect]) -> int:
+        return sum(1 for status in self.status_effects if isinstance(status, status_type))
+
+    def roll_skill(self, talent_name: str):
+        return skill_check(self, talent_name)
+
+    def get_status_modifier(self, check_context):
+        return sum(
+            status.get_modifier(check_context)
+            for status in self.status_effects
+            if status.applies_to(check_context)
+        )
 
     def get_attribute(self, name: str, default: int = 0) -> int:
         return self.attributes.get(name, default)
@@ -76,6 +90,19 @@ class Creature:
     def get_talent_value(self, name: str, default: int = 0) -> int:
         return self.talents.get(name, default)
     
+    def update_status_effects(self):
+        for status in self.status_effects:
+            if hasinstance(status, RoundCondition):
+                status.removal_condition.tick_round()
+                if not status.removal_condition.is_valid():
+                    self.status_effects.remove(status)
+
+            if hasinstance(status, ValueCondition):
+                if not status.removal_condition.is_valid():
+                    self.status_effects.remove(status)
+
+    def events_at_turn(self):
+        self.update_status_effects()
 
         self.statuus = {}
         self.disabled = False
@@ -270,64 +297,3 @@ class Creature:
         print(spec_text("GE ", bcolors.cyan, bcolors.reset), self.GE)
         print(spec_text("KO ", bcolors.cyan, bcolors.reset), self.KO)
         print(spec_text("KK ", bcolors.cyan, bcolors.reset), self.KK)
-
-    def talent_check(self, probe, mod=0):
-        """
-        Führt eine Probe auf das angegebene Talent aus.
-        Gibt sowohl die Attribute auf die gewürfelt wird als auch die Attributswerte den FW des Charakters aus.
-        Gibt anschließend die QS der Probe und informiert über krittische Erfolge und Fehlschläge.
-
-        Args:
-            probe (str): Talent auf das gewürfelt werden soll.
-            mod (int): Modifikation der Probe. Negative Werte entsprechen einer Erschwerniss.
-        """
-        for index, talent in enumerate(talents):
-            if probe.lower() in talent.lower():
-
-                if talent in self.talents.keys():
-                    # Fähigkeitswert
-                    FW = self.talents[talent]
-                else:
-                    FW = 0
-
-                # Würfelwurf
-                roll = np.array([random.randint(1, 20) for _ in range(3)])
-
-                # Attribute
-                attributes = np.array([getattr(self, attribute) for attribute in talents[talent] ])
-                #attributes = np.array([getattr(self, attribute) for attribute in talents.get(talent)])
-
-                try:
-                    mod -= self.statuus['Schmerz']
-                except:
-                    pass
-                
-                print('{0:} würfelt eine Probe auf {1:} mit einer Erschwerniss von {2:}.'.format(self.name, probe, mod))
-                print("{0:}'s FW ist {1:}.".format(self.name, FW))
-                print('Die relevanten Atribute sind {0:}/{1:}/{2:} = {3:}/{4:}/{5:}'.format(talents[talent][0], talents[talent][1], talents[talent][2], attributes[0], attributes[1], attributes[2]))
-                print('Die Würfel zeigen: {0:} - {1:} - {2:}'.format(roll[0], roll[1], roll[2]))
-
-                if np.sum(roll == 1) == 2:
-                    print(spec_text('__________________KRITISCHER_ERFOLG__________________\nQS = {:}'.format(QS(FW)), bcolors.purple, bcolors.BOLD))
-                    break
-
-                if np.sum(roll == 1) == 3:
-                    print(spec_text('__________________EPISCHER_ERFOLG__________________\nQS = {:}'.format(QS(FW)), bcolors.orange, bcolors.BOLD))
-                    break
-
-                if np.sum(roll == 20) == 2:
-                    print(spec_text('__________________KRITISCHER_FEHLSCHLAG__________________', bcolors.red, bcolors.BOLD))
-                    break
-
-                if np.sum(roll == 20) == 3:
-                    print(spec_text('__________________EPISCHER_FEHLSCHLAG__________________', bcolors.red, bcolors.BOLD))
-                    break
-
-                diff = (roll-mod) - attributes
-                FP = FW - sum(diff[diff > 0])
-                if FP >= 0:
-                    print(spec_text('ERFOLG! mit QS = {:}'.format(QS(FP)), bcolors.cyan))
-                    return QS(FP)
-                else:
-                    print(spec_text('FEHLSCHLAG!', bcolors.red))
-                    return 0

@@ -1,61 +1,297 @@
 {   
-    "Fliegen": ["MU", "IN", "GE"], 
-    "Gaukeleien": ["MU", "CH", "FF"], 
-    "Klettern": ["MU", "GE", "KK"], 
-    "Körperbeherrschung": ["GE", "GE", "KO"], 
-    "Kraftakt": ["KO", "KK", "KK"], 
-    "Reiten": ["CH", "GE", "KK"], 
-    "Schwimmen": ["GE", "KO", "KK"], 
-    "Selbstbeherrschung": ["MU", "MU", "KO"], 
-    "Singen": ["KL", "CH", "KO"], 
-    "Sinnesschärfe": ["KL", "IN", "IN"], 
-    "Tanzen": ["KL", "CH", "GE"], 
-    "Taschendiebstahl": ["MU", "FF", "GE"], 
-    "Verbergen": ["MU", "IN", "GE"], 
-    "Zechen": ["KL", "KO", "KK"], 
-    "Bekehren & Überzeugen": ["MU", "KL", "CH"], 
-    "Betören": ["MU", "CH", "CH"], 
-    "Einschüchtern": ["MU", "IN", "CH"], 
-    "Etikette": ["KL", "IN", "CH"], 
-    "Gassenwissen": ["KL", "IN", "CH"], 
-    "Menschenkenntnis": ["KL", "IN", "CH"], 
-    "Überreden": ["MU", "IN", "CH"], 
-    "Verkleiden": ["IN", "CH", "GE"], 
-    "Willenskraft": ["MU", "IN", "CH"], 
-    "Fährtensuchen": ["MU", "IN", "GE"], 
-    "Fesseln": ["KL", "FF", "KK"], 
-    "Fischen & Angeln": ["FF", "GE", "KO"], 
-    "Orientierung": ["KL", "IN", "IN"],
-    "Pflanzenkunde": ["KL", "FF", "KO"],
-    "Tierkunde": ["MU", "MU", "CH"],
-    "Wildnisleben": ["MU", "GE", "KO"],
-    "Brett- & Glücksspiel": ["KL", "KL", "IN"],
-    "Geographie": ["KL", "KL", "IN"],
-    "Geschichtswissen": ["KL", "KL", "IN"],
-    "Götter & Kulte": ["KL", "KL", "IN"],
-    "Kriegskunst": ["MU", "KL", "IN"],
-    "Magiekunde": ["KL", "KL", "IN"],
-    "Mechanik": ["KL", "KL", "FF"],
-    "Rechnen": ["KL", "KL", "IN"],
-    "Rechtskunde": ["KL", "KL", "IN"],
-    "Sagen & Legenden": ["KL", "KL", "IN"],
-    "Sphärenkunde": ["KL", "KL", "IN"],
-    "Sternkunde": ["KL", "KL", "IN"],
-    "Alchimie": ["MU", "KL", "FF"],
-    "Boote & Schiffe": ["FF", "GE", "KK"],
-    "Fahrzeuge": ["CH", "FF", "KO"],
-    "Handel": ["KL", "IN", "CH"],
-    "Heilkunde Gift": ["MU", "KL", "IN"],
-    "Heilkunde Krankheiten": ["MU", "IN", "KO"],
-    "Heilkunde Seele": ["IN", "CH", "KO"],
-    "Heilkunde Wunden": ["KL", "FF", "FF"],
-    "Holzbearbeitung": ["FF", "GE", "KK"],
-    "Lebensmittelbearbeitung": ["IN", "FF", "FF"],
-    "Lederbearbeitung": ["FF", "GE", "KO"],
-    "Malen & Zeichnen": ["IN", "FF", "FF"], 
-    "Metallbearbeitung": ["FF", "KO", "KK"], 
-    "Musizieren": ["CH", "FF", "KO"], 
-    "Schlösserknacken": ["IN", "FF", "FF"], 
-    "Steinbearbeitung": ["FF", "FF", "KK"], 
-    "Stoffbearbeitung": ["KL", "FF", "FF"]
+    "Fliegen": { 
+        "attributes": ["MU", "IN", "GE"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Gaukeleien": { 
+        "attributes": ["MU", "CH", "FF"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Klettern": { 
+        "attributes": ["MU", "GE", "KK"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Körperbeherrschung": { 
+        "attributes": ["GE", "GE", "KO"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Kraftakt": { 
+        "attributes": ["KO", "KK", "KK"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Reiten": { 
+        "attributes": ["CH", "GE", "KK"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Schwimmen": { 
+        "attributes": ["GE", "KO", "KK"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Selbstbeherrschung": { 
+        "attributes": ["MU", "MU", "KO"], 
+        "category": "physical",
+        "tags": ["concentration"]
+        },
+    "Singen": { 
+        "attributes": ["KL", "CH", "KO"], 
+        "category": "physical",
+        "tags": ["speech"]
+        },
+    "Sinnesschärfe": { 
+        "attributes": ["KL", "IN", "IN"], 
+        "category": "physical",
+        "tags": ["concentration"]
+        },
+    "Tanzen": { 
+        "attributes": ["KL", "CH", "GE"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Taschendiebstahl": { 
+        "attributes": ["MU", "FF", "GE"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Verbergen": { 
+        "attributes": ["MU", "IN", "GE"], 
+        "category": "physical",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Zechen": { 
+        "attributes": ["KL", "KO", "KK"], 
+        "category": "physical",
+        "tags": []
+        },
+    "Bekehren & Überzeugen": { 
+        "attributes": ["MU", "KL", "CH"], 
+        "category": "social",
+        "tags": ["speech"]
+        },
+    "Betören": { 
+        "attributes": ["MU", "CH", "CH"], 
+        "category": "social",
+        "tags": []
+        },
+    "Einschüchtern": { 
+        "attributes": ["MU", "IN", "CH"], 
+        "category": "social",
+        "tags": []
+        },
+    "Etikette": { 
+        "attributes": ["KL", "IN", "CH"], 
+        "category": "social",
+        "tags": []
+        },
+    "Gassenwissen": { 
+        "attributes": ["KL", "IN", "CH"], 
+        "category": "social",
+        "tags": []
+        },
+    "Menschenkenntnis": { 
+        "attributes": ["KL", "IN", "CH"], 
+        "category": "social",
+        "tags": []
+        },
+    "Überreden": { 
+        "attributes": ["MU", "IN", "CH"], 
+        "category": "social",
+        "tags": ["speech"]
+        },
+    "Verkleiden": { 
+        "attributes": ["IN", "CH", "GE"], 
+        "category": "social",
+        "tags": []
+        },
+    "Willenskraft": { 
+        "attributes": ["MU", "IN", "CH"], 
+        "category": "social",
+        "tags": []
+        },
+    "Fährtensuchen": { 
+        "attributes": ["MU", "IN", "GE"], 
+        "category": "nature",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Fesseln": { 
+        "attributes": ["KL", "FF", "KK"], 
+        "category": "nature",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Fischen & Angeln": { 
+        "attributes": ["FF", "GE", "KO"], 
+        "category": "nature",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Orientierung": { 
+        "attributes": ["KL", "IN", "IN"],
+        "category": "nature",
+        "tags": []
+        },
+    "Pflanzenkunde": { 
+        "attributes": ["KL", "FF", "KO"],
+        "category": "nature",
+        "tags": []
+        },
+    "Tierkunde": { 
+        "attributes": ["MU", "MU", "CH"],
+        "category": "nature",
+        "tags": ["encumbrance"]
+        },
+    "Wildnisleben": { 
+        "attributes": ["MU", "GE", "KO"],
+        "category": "nature",
+        "tags": ["movement", "encumbrance"]
+        },
+    "Brett- & Glücksspiel": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Geographie": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Geschichtswissen": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Götter & Kulte": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Kriegskunst": { 
+        "attributes": ["MU", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Magiekunde": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Mechanik": { 
+        "attributes": ["KL", "KL", "FF"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Rechnen": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Rechtskunde": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Sagen & Legenden": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Sphärenkunde": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Sternkunde": { 
+        "attributes": ["KL", "KL", "IN"],
+        "category": "knowledge",
+        "tags": []
+        },
+    "Alchimie": { 
+        "attributes": ["MU", "KL", "FF"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Boote & Schiffe": { 
+        "attributes": ["FF", "GE", "KK"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Fahrzeuge": { 
+        "attributes": ["CH", "FF", "KO"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Handel": { 
+        "attributes": ["KL", "IN", "CH"],
+        "category": "crafting",
+        "tags": ["speech"]
+        },
+    "Heilkunde Gift": { 
+        "attributes": ["MU", "KL", "IN"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Heilkunde Krankheiten": { 
+        "attributes": ["MU", "IN", "KO"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Heilkunde Seele": { 
+        "attributes": ["IN", "CH", "KO"],
+        "category": "crafting",
+        "tags": ["speech"]
+        },
+    "Heilkunde Wunden": { 
+        "attributes": ["KL", "FF", "FF"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Holzbearbeitung": { 
+        "attributes": ["FF", "GE", "KK"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Lebensmittelbearbeitung": { 
+        "attributes": ["IN", "FF", "FF"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Lederbearbeitung": { 
+        "attributes": ["FF", "GE", "KO"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Malen & Zeichnen": { 
+        "attributes": ["IN", "FF", "FF"], 
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Metallbearbeitung": { 
+        "attributes": ["FF", "KO", "KK"], 
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Musizieren": { 
+        "attributes": ["CH", "FF", "KO"], 
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Schlösserknacken": { 
+        "attributes": ["IN", "FF", "FF"], 
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Steinbearbeitung": { 
+        "attributes": ["FF", "FF", "KK"], 
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        },
+    "Stoffbearbeitung": { 
+        "attributes": ["KL", "FF", "FF"],
+        "category": "crafting",
+        "tags": ["encumbrance"]
+        }
 }
