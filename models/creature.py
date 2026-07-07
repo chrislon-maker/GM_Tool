@@ -1,9 +1,10 @@
 from dataclasses import dataclass, field
-from .resource import Resource
-from .weapon import Weapon
-from .status_effect import StatusEffect
-import numpy as np
-import random, re, inspect
+
+from models.species import Species
+from models.resource import Resource, DerivedValue, Attribute
+from models.weapon import Weapon
+from models.status_effect import StatusEffect
+from services.checks import skill_check
 
 
 """
@@ -26,18 +27,38 @@ def make_skill_check(self, talent: str):
 """
 
 @dataclass
-class Creature:
+class CreatureBase:
     name: str = ""
+    family: str = ""
+    home: str = ""
+    birthday: str = ""
+    size: str = ""
+    hair_color: str = "" 
+    eye_color: str = ""
+    species: Species
+    culture: str | None = None
+    profession: str | None = None
+    social_status: str = "" 
+    gender: str = ""
 
     source: str | None = None
     source_url: str | None = None
 
-    attributes: dict[str, int] = field(default_factory=dict)
-    resources: dict[str, Resource] = field(default_factory=dict)    # LeP, SaP, KaP, Schips
-    derived_values: dict[str, int | str] = field(default_factory=dict)  # SK, ZK, AW, INI, GS
+    attributes: dict[Attribute, int] = field(default_factory=dict)
     talents: dict[str, int] = field(default_factory=dict)
 
-    status_effects: list[StatusEffect] = field(default_factory=list)
+    LeP: Resource
+    KaP: Resource
+    AsP: Resource
+    chips: Resource
+
+    GS: DerivedValue
+    INI: DerivedValue
+    SK: DerivedValue
+    ZK: DerivedValue
+    AW: DerivedValue
+
+    status_effects = []
 
     weapons: list[Weapon] = field(default_factory=list)
     armor: list[dict] = field(default_factory=list)
@@ -51,18 +72,33 @@ class Creature:
 
     notes: str = ""
 
+    disabled: bool = False
+    dying: bool = False
+
+
+class Creature(CreatureBase):
+
     def status_level(self, status_type: type[StatusEffect]) -> int:
         return sum(1 for status in self.status_effects if isinstance(status, status_type))
+    
+    def add_status(self, status: StatusEffect) -> None:
+        self.status_effects.append(status)
+        
+    def remove_invalid_status_effects(self) -> None:
+        self.status_effects = [
+            status for status in self.status_effects
+            if status.is_valid()
+            ]
 
-    def roll_skill(self, talent_name: str):
-        return skill_check(self, talent_name)
+    def time_step(self):
+        for status in self.status_effects:
+            if status.removal_condition is not None and hasattr(status.removal_condition, "tick_round"):
+                status.removal_condition.tick_round()
 
-    def get_status_modifier(self, check_context):
-        return sum(
-            status.get_modifier(check_context)
-            for status in self.status_effects
-            if status.applies_to(check_context)
-        )
+    # TBD
+    def events_at_turn(self):
+        self.time_step()
+        self.remove_invalid_status_effects()
 
     def get_attribute(self, name: str, default: int = 0) -> int:
         return self.attributes.get(name, default)
@@ -90,28 +126,9 @@ class Creature:
     def get_talent_value(self, name: str, default: int = 0) -> int:
         return self.talents.get(name, default)
     
-    def update_status_effects(self):
-        for status in self.status_effects:
-            if hasinstance(status, RoundCondition):
-                status.removal_condition.tick_round()
-                if not status.removal_condition.is_valid():
-                    self.status_effects.remove(status)
 
-            if hasinstance(status, ValueCondition):
-                if not status.removal_condition.is_valid():
-                    self.status_effects.remove(status)
+'''
 
-    def events_at_turn(self):
-        self.update_status_effects()
-
-        self.statuus = {}
-        self.disabled = False
-        self.dying = False
-    
-        # characteristics
-        self.name = ''
-        self.species = ''
-        self.size = ''
 
         # attributes
         self.attributes = {
@@ -297,3 +314,4 @@ class Creature:
         print(spec_text("GE ", bcolors.cyan, bcolors.reset), self.GE)
         print(spec_text("KO ", bcolors.cyan, bcolors.reset), self.KO)
         print(spec_text("KK ", bcolors.cyan, bcolors.reset), self.KK)
+'''

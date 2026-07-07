@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Callable
 
+
+#__CONDITIONS AND COUNTERS_____________________________________________________________________
+
 @dataclass
 class ConditionCheck:
     minimum: int | None = None
@@ -59,95 +62,176 @@ class ValueCondition(ConditionCheck):
         return self.resource.current
 
 
+#__STATUS EFFECTS_____________________________________________________________________
 
 @dataclass
-class StatusEffect:
-    name: str = ""
+class ValueModifier:
+    additive: int = 0
+    multiplicative: float = 0.0
 
-    source: str = ""
 
-    affected_check_types: set[str] = set()
-    affected_attributes: set[str] = set()
-    affected_talents: set[str] = set()
+@dataclass
+class Encumbrance:
+    name: str = "Belastung"
 
+    affected_talents: list[str] = [
+        "Fliegen",
+        "Gaukeleien",
+        "Klettern",
+        "Körperbeherrschung",
+        "Kraftakt",
+        "Reiten",
+        "Schwimmen",
+        "Tanzen",
+        "Taschendiebstahl",
+        "Verbergen",
+        "Fährtensuchen",
+        "Tierkunde",
+        "Wildnisleben",
+        "Alchemie",
+        "Boote & Schiffe",
+        "Fahrzeuge",
+        "Heilkunde Gift",
+        "Heilkunde Krankheiten",
+        "Heilkunde Wunden",
+        "Holzbearbeitung",
+        "Lebensmittelverarbeitung",
+        "Lederverarbeitung",
+        "Malen & Zeichnen",
+        "Metallbearbeitung",
+        "Musizieren",
+        "Schlösserknacken",
+        "Steinbearbeitung",
+        "Stoffbearbeitung"
+        ]
+    
     removal_condition: ConditionCheck | None = None
 
     def is_valid(self):
-        if self.removal_condition is not None:
-            return self.removal_condition.is_valid()
-        return False
+        if self.removal_condition is None:
+            return True
+        return self.removal_condition.is_valid()
 
-    def get_modifier(self, check_context) -> int:
-        return 0
+    # modifies a current value of some derived property
+    def get_modifier(self, property) -> ValueModifier:
+        if isinstance(property, MovementSpeed):
+            return ValueModifier(additive=-1)
 
+        if isinstance(property, Initiative):
+            return ValueModifier(additive=-1)
+        
+        if isinstance(property, Evasion):
+            return ValueModifier(additive=-1)
+        
+        if isinstance(property, AttackValue):
+            return ValueModifier(additive=-1)
+        
+        if isinstance(property, Parry):
+            return ValueModifier(additive=-1)
+        
+        if isinstance(property, TalentDefinition) and property.name in self.affected_talents:
+            return ValueModifier(additive=-1)
+
+        return ValueModifier()
+         
+
+@dataclass
+class Pain:
+    name = "Schmerz"
+    affected_talents: str = "all"
+    removal_condition: ConditionCheck | None = None
+
+    def is_valid(self):
+        if self.removal_condition is None:
+            return True
+        return self.removal_condition.is_valid()
+
+    # modifies a current value of some derived property
+    def get_modifier(self, property) -> ValueModifier:
+        if isinstance(property, MovementSpeed):
+            return ValueModifier(additive=-1)
+
+        if isinstance(property, TalentDefinition):
+            return ValueModifier(additive=-1)
+
+        return ValueModifier()
     
 
-
-class Pain(StatusEffect):
-    name = "Schemerz"
-
-    def modify_check(self, ctx, modifier):
-        return modifier - self.level
-
-    def modify_derived_value(self, name, value):
-        if name == "GS":
-            return value - self.level
-        return value
-    
-class Fear(StatusEffect):
+@dataclass
+class Fear:
     name = "Furcht"
+    affected_talents: str = "all"
+    removal_condition: ConditionCheck | None = None
 
-    def modify_check(self, ctx, modifier):
-        return modifier - self.level
+    def is_valid(self):
+        if self.removal_condition is None:
+            return True
+        return self.removal_condition.is_valid()
 
-    def modify_derived_value(self, name, value):
-        if name == "GS":
-            return value - self.level
-        return value
-    
-class Stun(StatusEffect):
-    name = "Betäubung"
+    # modifies a current value of some derived property
+    def get_modifier(self, property) -> ValueModifier:
+        if isinstance(property, TalentDefinition):
+            return ValueModifier(additive=-1)
 
-    def modify_check(self, ctx, modifier):
-        return modifier - self.level
+        return ValueModifier()
 
-    def modify_derived_value(self, name, value):
-        if name == "GS":
-            return value - self.level
-        return value
-    
-class Confusion(StatusEffect):
+
+@dataclass
+class Confusion:
     name = "Verwirrung"
+    affected_talents: str = "all"
+    removal_condition: ConditionCheck | None = None
 
-    def modify_check(self, ctx, modifier):
-        return modifier - self.level
+    def is_valid(self):
+        if self.removal_condition is None:
+            return True
+        return self.removal_condition.is_valid()
 
-    def modify_derived_value(self, name, value):
-        if name == "GS":
-            return value - self.level
-        return value
+    # modifies a current value of some derived property
+    def get_modifier(self, property) -> ValueModifier:
+        if isinstance(property, TalentDefinition):
+            return ValueModifier(additive=-1)
+
+        return ValueModifier()
     
-class Encumbrance(StatusEffect):
-    name = "Belastung"
 
-    def modify_check(self, ctx, modifier):
-        return modifier - self.level
+@dataclass
+class Stun:
+    name = "Betäubung"
+    affected_talents: str = "all"
+    removal_condition: ConditionCheck | None = None
 
-    def modify_derived_value(self, name, value):
-        if name == "GS":
-            return value - self.level
-        return value
+    def is_valid(self):
+        if self.removal_condition is None:
+            return True
+        return self.removal_condition.is_valid()
+
+    # modifies a current value of some derived property
+    def get_modifier(self, property) -> ValueModifier:
+        if isinstance(property, TalentDefinition):
+            return ValueModifier(additive=-1)
+
+        return ValueModifier()
 
 
-class Paralysis(StatusEffect):
+@dataclass
+class Paralysis:
     name = "Paralyse"
+    affected_talents: list[str] = ["movement", "speech"]
+    removal_condition: ConditionCheck | None = None
 
-    def modify_check(self, ctx, modifier):
-        if ctx.requires_movement or ctx.requires_speech:
-            return modifier - self.level
-        return modifier
+    def is_valid(self):
+        if self.removal_condition is None:
+            return True
+        return self.removal_condition.is_valid()
 
-    def modify_derived_value(self, name, value):
-        if name == "GS":
-            return int(value * [1, 0.75, 0.5, 0.25][self.level])
-        return value
+    # modifies a current value of some derived property
+    def get_modifier(self, property) -> ValueModifier:
+        if isinstance(property, MovementSpeed):
+            return ValueModifier(multiplicative=-0.25)
+
+        if isinstance(property, TalentDefinition) and not set(self.affected_talents).isdisjoint(property.tags):
+            return ValueModifier(additive=-1)
+        
+        return ValueModifier()
+

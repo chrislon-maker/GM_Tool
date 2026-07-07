@@ -1,11 +1,26 @@
 from dataclasses import dataclass, field
+from .status_effect import Pain, Paralysis, Encumbrance
+from enum import Enum
 
-@dataclass
+
+class Attribute(Enum):
+    MU = "MU"
+    KL = "KL"
+    IN = "IN"
+    CH = "CH"
+    FF = "FF"
+    GE = "GE"
+    KO = "KO"
+    KK = "KK"
+
+#__RESOURCES________________________________________________________________________________
+
 class Resource:
-    initial: int
-    current: initial
-    maximum: int | None = None
-    minimum: int | None = None
+    def __init__(self, initial: int, maximum: int | None = None, minimum: int | None = None):
+        self.initial = initial
+        self.current = initial
+        self.maximum = maximum
+        self.minimum = minimum
 
     def reset(self):
         self.current = self.initial
@@ -14,10 +29,105 @@ class Resource:
         if self.minimum is None:
             self.current = self.current - amount
         else:
-            self.current = min(self.maximum, self.current + amount)
+            self.current = max(self.mainimum, self.current - amount)
 
     def restore(self, amount: int) -> None:
         if self.maximum is None:
             self.current = self.current + amount
         else:
             self.current = min(self.maximum, self.current + amount)
+
+
+#__DERIVED VALUES__________________________________________________________________________
+
+class DerivedValue:
+    name = ""
+    maximum = float("inf")
+    minimum = -float("inf")
+
+    def __init__(self, creature, base: int | None = None):
+        self.creature = creature
+        if base is None:
+            self.base = self.calculate
+        else:
+            self.base = base
+
+    @property
+    def calculate(self):
+        return 0
+
+    @property
+    def current(self):
+        additive = 0
+        multiplier = 1.
+
+        for effect in self.creature.status_effects:
+            modifier += effect.get_modifier(self)
+            additive += modifier.additive
+            multiplier += modifier.multiplicative
+
+        current_value = (self.base - additive) * multiplier    
+        return min(self.maximum, max(self.minimum, current_value))
+    
+
+    
+class MovementSpeed(DerivedValue):
+    name = "GS"
+    minimum = 0
+
+    @property
+    def calculate(self):
+        return self.creature.culture.movement_speed
+
+
+class SoulPower(DerivedValue):
+    name = "SK"
+
+    @property
+    def calculate(self):
+        return int( self.creature.culture.soul_power + (self.creature.MU + self.creature.KL + self.creature.IN)/6. )
+    
+class Toughness(DerivedValue):
+    name = "ZK"
+
+    @property
+    def calculate(self):
+        return int( self.creature.culture.toughness + (self.creature.KO + self.creature.KO + self.creature.KK)/6. )
+
+
+class Initiative(DerivedValue):
+    name = "INI"
+    minimum = 0
+    bonus: int = 0
+
+    def __init__(self, creature, base: int | None = None):
+        self.creature = creature
+        if base is None:
+            self.base_flat = self.calculate
+        else:
+            self.base_flat = base
+    
+    @property
+    def base(self):
+        return self.base_flat + self.bonus
+
+    def roll(self, die_sides: int = 6):
+        self.bonus = random.randint(1, die_sides)
+
+    @property
+    def calculate(self):
+        return int( (self.creature.MU + self.creature.GE)/2. )
+    
+
+class Evasion(DerivedValue):
+    name = "AW"
+    minimum = 0
+
+    @property
+    def calculate(self):
+        return int( self.creature.GE/2. )
+    
+
+
+
+
