@@ -1,7 +1,66 @@
 from dataclasses import dataclass, field
-from .status_effect import Pain, Paralysis, Encumbrance
 from enum import Enum
+import random
+from dataclasses import dataclass
+from typing import ClassVar
+from models.properties import Attribute
+import json
 
+
+#__TALENTS________________________________________________________________________________
+
+@dataclass(frozen=True)
+class TalentDefinition:
+    name: str
+    attributes: tuple[Attribute, Attribute, Attribute]
+    category: str
+    tags: frozenset[str]
+
+    _definitions: ClassVar[dict[str, "TalentDefinition"] | None] = None
+
+    @classmethod
+    def load_all(cls) -> None:
+        if cls._definitions is not None:
+            return
+
+        with open("data/talents.json", encoding="utf-8") as f:
+            raw_data = json.load(f)
+
+        cls._definitions = {
+            name: cls(
+                name=name,
+                attributes=tuple(Attribute[a] for a in data["attributes"]),
+                category=data["category"],
+                tags=frozenset(data.get("tags", [])),
+            )
+            for name, data in raw_data.items()
+        }
+
+    @classmethod
+    def get(cls, name: str) -> "TalentDefinition":
+        cls.load_all()
+
+        if cls._definitions is None:
+            raise RuntimeError("Talent definitions were not loaded")
+
+        if name not in cls._definitions:
+            raise KeyError(f"Unbekanntes Talent: {name}")
+
+        return cls._definitions[name]
+
+    @classmethod
+    def all(cls) -> dict[str, "TalentDefinition"]:
+        cls.load_all()
+
+        if cls._definitions is None:
+            raise RuntimeError("Talent definitions were not loaded")
+
+        return cls._definitions
+    
+
+
+
+#__ATTRIBUTES________________________________________________________________________________
 
 class Attribute(Enum):
     MU = "MU"
@@ -29,7 +88,7 @@ class Resource:
         if self.minimum is None:
             self.current = self.current - amount
         else:
-            self.current = max(self.mainimum, self.current - amount)
+            self.current = max(self.minimum, self.current - amount)
 
     def restore(self, amount: int) -> None:
         if self.maximum is None:
@@ -41,9 +100,9 @@ class Resource:
 #__DERIVED VALUES__________________________________________________________________________
 
 class DerivedValue:
-    name = ""
-    maximum = float("inf")
-    minimum = -float("inf")
+    name: str = ""
+    maximum: int | float = float("inf")
+    minimum: int | float = -float("inf")
 
     def __init__(self, creature, base: int | None = None):
         self.creature = creature
@@ -62,11 +121,11 @@ class DerivedValue:
         multiplier = 1.
 
         for effect in self.creature.status_effects:
-            modifier += effect.get_modifier(self)
+            modifier = effect.get_modifier(self)
             additive += modifier.additive
             multiplier += modifier.multiplicative
 
-        current_value = (self.base - additive) * multiplier    
+        current_value = (self.base + additive) * multiplier    
         return min(self.maximum, max(self.minimum, current_value))
     
 
@@ -127,7 +186,5 @@ class Evasion(DerivedValue):
     def calculate(self):
         return int( self.creature.GE/2. )
     
-
-
 
 

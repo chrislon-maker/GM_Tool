@@ -1,9 +1,8 @@
 from PyPDF2 import PdfReader
-from models.creature import CreatureBase, Creature
-from models.resource import Attribute, Resource, SoulPower, MovementSpeed, Toughness, Evasion, Initiative
-from urllib.request import urlopen
-from tqdm import tqdm
-import re, json, os
+from models.creature import Creature
+from models.properties import Attribute, Resource, SoulPower, MovementSpeed, Toughness, Evasion, Initiative
+from services.checks import TalentDefinition
+import re
 
 
 '''
@@ -17,8 +16,36 @@ reader.pages
 reader.pages[n].extract_text()
 '''
 
+
+def get_str(data: dict, key: str, default: str = "") -> str:
+    value = data.get(key)
+    if value is None or value == "-":
+        return default
+    return str(value).strip()
+
+
+def get_int(data: dict, key: str, default: int = 0) -> int:
+    value = data.get(key)
+
+    if value is None:
+        return default
+
+    value = str(value).strip()
+
+    if value in ("", "-", "–"):
+        return default
+
+    # entfernt z.B. "(8)" oder andere Nicht-Zahlen
+    value = re.sub(r"[^\d-]", "", value)
+
+    if value in ("", "-"):
+        return default
+
+    return int(value)
+
+
+
 def load_character_from_pdf(pdf_path: str) -> Creature:
-    creature = Creature()
 
     with open(pdf_path, 'rb') as file:
         reader = PdfReader(file)
@@ -29,85 +56,53 @@ def load_character_from_pdf(pdf_path: str) -> Creature:
         data = {}
         for field_name, field_data in form_fields.items():
             data[field_name] = field_data.get('/V', None)
-
-    '''
-
-        source: str | None = None
-        source_url: str | None = None
-
-        talents: dict[str, int] = field(default_factory=dict)
-
-        LeP: Resource
-        KaP: Resource
-        AsP: Resource
-        chips: Resource
-
-        GS: DerivedValue
-        INI: DerivedValue
-        SK: DerivedValue
-        ZK: DerivedValue
-        AW: DerivedValue
-
-        status_effects = []
-
-        weapons: list[Weapon] = field(default_factory=list)
-        armor: list[dict] = field(default_factory=list)
-
-        advantages: list[str] = field(default_factory=list)
-        disadvantages: list[str] = field(default_factory=list)
-        special_abilities: list[str] = field(default_factory=list)
-
-        spells: dict[str, int] = field(default_factory=dict)
-        liturgies: dict[str, int] = field(default_factory=dict)
-
-        notes: str = ""
-
-        disabled: bool = False
-        dying: bool = False'''
     
+    creature = Creature()
+
     # characteristics
-    creature.name = data['Held_Name']
-    creature.family = data['Held_Familie']
-    creature.home = data['Held_Geburtsort']
-    creature.birthday = data['Held_Geburtsdatum']
-    creature.species = data['Held_Spezies_Anzeige']
+    creature.name = get_str(data, 'Held_Name')
+    creature.family = get_str(data, 'Held_Familie')
+    creature.home = get_str(data, 'Held_Geburtsort')
+    creature.birthday = get_str(data, 'Held_Geburtsdatum')
+    creature.species = get_str(data, 'Held_Spezies_Anzeige')
 
-    creature.size = data['Held_Groesse']
-    creature.hair_color = data['Held_Haare']
-    creature.eye_color = data['Held_Augen']
-    creature.culture = data['Held_Kultur_Anzeige']
-    creature.profession = data['Held_Profession_Anzeige']
+    creature.size = get_str(data, 'Held_Groesse')
+    creature.hair_color = get_str(data, 'Held_Haare')
+    creature.eye_color = get_str(data, 'Held_Augen')
+    creature.culture = get_str(data, 'Held_Kultur_Anzeige')
+    creature.profession = get_str(data, 'Held_Profession_Anzeige')
 
-    creature.social_status = data['Held_Sozialstatus']
-    creature.gender = data['Held_Geschlecht']
+    creature.social_status = get_str(data, 'Held_Sozialstatus')
+    creature.gender = get_str(data, 'Held_Geschlecht')
 
     # attributes
-    creature.attributes[Attribute.MU] = int(data["MU_1"])
-    creature.attributes[Attribute.KL] = int(data["KL_1"])
-    creature.attributes[Attribute.IN] = int(data["IN_1"])
-    creature.attributes[Attribute.CH] = int(data["CH_1"])
-    creature.attributes[Attribute.FF] = int(data["FF_1"])
-    creature.attributes[Attribute.GE] = int(data["GE_1"])
-    creature.attributes[Attribute.KO] = int(data["KO_1"])
-    creature.attributes[Attribute.KK] = int(data["KK_1"])
+    creature.attributes[Attribute.MU] = get_int(data, "MU_1")
+    creature.attributes[Attribute.KL] = get_int(data, "KL_1")
+    creature.attributes[Attribute.IN] = get_int(data, "IN_1")
+    creature.attributes[Attribute.CH] = get_int(data, "CH_1")
+    creature.attributes[Attribute.FF] = get_int(data, "FF_1")
+    creature.attributes[Attribute.GE] = get_int(data, "GE_1")
+    creature.attributes[Attribute.KO] = get_int(data, "KO_1")
+    creature.attributes[Attribute.KK] = get_int(data, "KK_1")
 
     # resources
-    creature.LeP = Resource(int(data['LE_Wert_1']),  maximum=int(data['LE_Max_1']))
-    creature.AsP = Resource(int(data['AE_Wert_1']),  maximum=int(data['AE_Max_1']), minimum=0)
-    creature.KaP = Resource(int(data['KE_Wert_1']),  maximum=int(data['KE_Max_1']), minimum=0)
-    creature.chips = Resource(int(data['SchiP_Aktuell_1']), maximum=int(data['SchiP_Max_1']), minimum=0)
+    creature.LeP = Resource(get_int(data, 'LE_Wert_1'),  maximum=get_int(data, 'LE_Max_1'))
+    creature.AsP = Resource(get_int(data, 'AE_Wert_1'),  maximum=get_int(data, 'AE_Max_1'), minimum=0)
+    creature.KaP = Resource(get_int(data, 'KE_Wert_1'),  maximum=get_int(data, 'KE_Max_1'), minimum=0)
+    creature.chips = Resource(get_int(data, 'SchiP_Aktuell_1'), maximum=get_int(data, 'SchiP_Max_1'), minimum=0)
 
     # derived values
-    creature.SK = SoulPower(creature, int(data['SK_Max_1']))
-    creature.ZK = Toughness(creature, int(data['ZK_Max_1']))
-    creature.AW = Evasion(creature, int( re.sub(r"\(\d+\)" , "", data['AW_Max_1']) ))
-    creature.INI = Initiative(creature, int(data['INI_Max_1']))
-    creature.GS = MovementSpeed(creature, data['GS_Max_1'])
+    creature.SK = SoulPower(creature, get_int(data, 'SK_Max_1'))
+    creature.ZK = Toughness(creature, get_int(data, 'ZK_Max_1'))
+    #creature.AW = Evasion(creature, int( re.sub(r"\(\d+\)" , "", data['AW_Max_1']) ))
+    creature.AW = Evasion(creature, get_int(data, 'AW_Max_1'))
+    creature.INI = Initiative(creature, get_int(data, 'INI_Max_1'))
+    creature.GS = MovementSpeed(creature, get_int(data, 'GS_Max_1'))
 
 
     # Talente
-    for index, talent in enumerate(TalentDefinition._definitions.keys()):
-        creature.talents[talent] = int(data['Talent_FW_{:}'.format(index+1)])
+    for index, talent_name in enumerate(TalentDefinition.all().keys()):
+        creature.talents[talent_name] = get_int(data, 'Talent_FW_{:}'.format(index+1))
     
     # Inventory
     creature.inventory = []
@@ -149,7 +144,7 @@ def load_character_from_pdf(pdf_path: str) -> Creature:
     creature.advantages = re.split(r"\s*/\s*", data["Held_Vorteile"])
     creature.disadvantages = re.split(r"\s*/\s*", data["Held_Nachteile"])
     creature.money = [data["Geld_D"], data["Geld_S"], data["Geld_H"], data["Geld_K"]]
-    
+
     return creature
 
 

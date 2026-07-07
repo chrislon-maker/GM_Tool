@@ -41,6 +41,6 @@ class Meele_Weapon(Weapon):
 @dataclass
 class Ranged_Weapon(Weapon):
     loading_period: int | None = None
-    distance: list[int]
+    distance: list[int] = field(default_factory=list)
     munition: str | None = None
 

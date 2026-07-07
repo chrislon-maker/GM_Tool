@@ -1,10 +1,8 @@
 from dataclasses import dataclass, field
 
 from models.species import Species
-from models.resource import Resource, DerivedValue, Attribute
+from models.properties import Resource, DerivedValue, Attribute
 from models.weapon import Weapon
-from models.status_effect import StatusEffect
-from services.checks import skill_check
 
 
 """
@@ -35,7 +33,7 @@ class CreatureBase:
     size: str = ""
     hair_color: str = "" 
     eye_color: str = ""
-    species: Species
+    species: Species = field(default_factory=Species)
     culture: str | None = None
     profession: str | None = None
     social_status: str = "" 
@@ -44,21 +42,22 @@ class CreatureBase:
     source: str | None = None
     source_url: str | None = None
 
-    attributes: dict[Attribute, int] = field(default_factory=dict)
+    attributes: dict[str, int] = field(default_factory=dict)
     talents: dict[str, int] = field(default_factory=dict)
 
-    LeP: Resource
-    KaP: Resource
-    AsP: Resource
-    chips: Resource
+    LeP: Resource = field(default_factory=lambda: Resource(0))
+    KaP: Resource = field(default_factory=lambda: Resource(0))
+    AsP: Resource = field(default_factory=lambda: Resource(0))
+    chips: Resource = field(default_factory=lambda: Resource(0))
 
-    GS: DerivedValue
-    INI: DerivedValue
-    SK: DerivedValue
-    ZK: DerivedValue
-    AW: DerivedValue
+    GS: DerivedValue = field(init=False)
+    INI: DerivedValue = field(init=False)
+    SK: DerivedValue = field(init=False)
+    ZK: DerivedValue = field(init=False)
+    AW: DerivedValue = field(init=False)
 
-    status_effects = []
+    #status_effects: list = field(default_factory=list)
+    status_effects: dict = field(default_factory=dict)
 
     weapons: list[Weapon] = field(default_factory=list)
     armor: list[dict] = field(default_factory=list)
@@ -77,12 +76,11 @@ class CreatureBase:
 
 
 class Creature(CreatureBase):
-
-    def status_level(self, status_type: type[StatusEffect]) -> int:
-        return sum(1 for status in self.status_effects if isinstance(status, status_type))
     
-    def add_status(self, status: StatusEffect) -> None:
-        self.status_effects.append(status)
+    def add_status(self, status_type: type[StatusEffect], removal_condition: ConditionCheck) -> None:
+        if not status_type in self.status_effects:
+            self.status_effects[status_type] = status_type()
+        self.status_effects[status_type].removal_conditions.append(removal_condition)
         
     def remove_invalid_status_effects(self) -> None:
         self.status_effects = [
@@ -94,6 +92,38 @@ class Creature(CreatureBase):
         for status in self.status_effects:
             if status.removal_condition is not None and hasattr(status.removal_condition, "tick_round"):
                 status.removal_condition.tick_round()
+
+    @property
+    def MU(self):
+        return self.attributes[Attribute.MU]
+    
+    @property
+    def KL(self):
+        return self.attributes[Attribute.KL]
+    
+    @property
+    def IN(self):
+        return self.attributes[Attribute.IN]
+    
+    @property
+    def CH(self):
+        return self.attributes[Attribute.CH]
+    
+    @property
+    def FF(self):
+        return self.attributes[Attribute.FF]
+    
+    @property
+    def GE(self):
+        return self.attributes[Attribute.GE]
+    
+    @property
+    def KK(self):
+        return self.attributes[Attribute.KK]
+    
+    @property
+    def KO(self):
+        return self.attributes[Attribute.KO]
 
     # TBD
     def events_at_turn(self):
