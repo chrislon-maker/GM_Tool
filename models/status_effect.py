@@ -1,8 +1,28 @@
 from dataclasses import dataclass, field
-from models.talents import TalentDefinition
+from models.properties import TalentDefinition, MovementSpeed
 from typing import ClassVar, Callable
 
 #__CONDITIONS AND COUNTERS_____________________________________________________________________
+
+class Counter:
+    '''
+    Holds an integer which can be increased and decreases
+    '''
+    def __init__(self, value: int = 0):
+        self.value = value
+
+    def increase(self, amount: int = 1):
+        self.value += amount
+
+    def decrease(self, amount: int = 1):
+        self.value -= amount
+
+
+class RoundCounter(Counter):
+    def tick_round(self):
+        self.increase()
+
+
 
 @dataclass
 class ConditionCheck:
@@ -26,25 +46,6 @@ class ConditionCheck:
             return False
 
         return True
-
-
-class Counter:
-    '''
-    Holds an integer which can be increased and decreases
-    '''
-    def __init__(self, value: int = 0):
-        self.value = value
-
-    def increase(self, amount: int = 1):
-        self.value += amount
-
-    def decrease(self, amount: int = 1):
-        self.value -= amount
-
-
-class RoundCounter(Counter):
-    def tick_round(self):
-        self.increase()
 
 
 class RoundCondition(ConditionCheck):
@@ -76,6 +77,22 @@ class ValueCondition(ConditionCheck):
     @property
     def check_value(self):
         return self.resource.current
+    
+
+@dataclass
+class DependentCondition(ConditionCheck):
+    '''
+    Validity depents on validity of an other object
+    Call:   DependentCondition(myarmor.is_worn)    for normal method
+    Call:   DependentCondition(lambda: myarmor.is_worn)    for @property
+    Call:   DependentCondition(lambda: creature.LeP.current < 0.75*creature.LeP.maximum)   
+    '''
+
+    def __init__(self, dependence: Callable[[], bool]):
+        self.dependence = dependence
+    
+    def is_valid(self) -> bool:
+        return self.dependence()
 
 
 #__STATUS EFFECTS_____________________________________________________________________
@@ -93,6 +110,7 @@ class StatusEffect:
 
     @property
     def level(self) -> int:
+        self.check_validity()
         return len(self.removal_conditions)
     
     def check_validity(self):

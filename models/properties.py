@@ -3,8 +3,22 @@ from enum import Enum
 import random
 from dataclasses import dataclass
 from typing import ClassVar
-from models.properties import Attribute
 import json
+
+
+
+#__ATTRIBUTES________________________________________________________________________________
+
+class Attribute(Enum):
+    MU = "MU"
+    KL = "KL"
+    IN = "IN"
+    CH = "CH"
+    FF = "FF"
+    GE = "GE"
+    KO = "KO"
+    KK = "KK"
+
 
 
 #__TALENTS________________________________________________________________________________
@@ -60,18 +74,6 @@ class TalentDefinition:
 
 
 
-#__ATTRIBUTES________________________________________________________________________________
-
-class Attribute(Enum):
-    MU = "MU"
-    KL = "KL"
-    IN = "IN"
-    CH = "CH"
-    FF = "FF"
-    GE = "GE"
-    KO = "KO"
-    KK = "KK"
-
 #__RESOURCES________________________________________________________________________________
 
 class Resource:
@@ -84,13 +86,13 @@ class Resource:
     def reset(self):
         self.current = self.initial
 
-    def lose(self, amount: int) -> None:
+    def decrease(self, amount: int) -> None:
         if self.minimum is None:
             self.current = self.current - amount
         else:
             self.current = max(self.minimum, self.current - amount)
 
-    def restore(self, amount: int) -> None:
+    def increase(self, amount: int) -> None:
         if self.maximum is None:
             self.current = self.current + amount
         else:
@@ -120,7 +122,7 @@ class DerivedValue:
         additive = 0
         multiplier = 1.
 
-        for effect in self.creature.status_effects:
+        for effect in self.creature.status_effects.values():
             modifier = effect.get_modifier(self)
             additive += modifier.additive
             multiplier += modifier.multiplicative

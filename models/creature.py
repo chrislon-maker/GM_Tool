@@ -3,6 +3,9 @@ from dataclasses import dataclass, field
 from models.species import Species
 from models.properties import Resource, DerivedValue, Attribute
 from models.weapon import Weapon
+from models.status_effect import StatusEffect, ConditionCheck
+
+import numpy as np
 
 
 """
@@ -124,6 +127,45 @@ class Creature(CreatureBase):
     @property
     def KO(self):
         return self.attributes[Attribute.KO]
+    
+    def pain_markers(self) -> tuple[int, int, int, int]:
+        return np.array([
+            int(0.75 * self.LeP.maximum),
+            int(0.50 * self.LeP.maximum),
+            int(0.25 * self.LeP.maximum),
+            5,
+        ])
+    
+    def get_damage(self, amount: int) -> None:
+        pain_markers = self.pain_markers()
+
+        before = {
+            marker for marker in pain_markers
+            if self.LeP.current < marker
+        }
+
+        self.LeP.decrease(amount)
+
+        after = {
+            marker for marker in pain_markers
+            if self.LeP.current < marker
+        }
+
+        newly_crossed = after - before
+
+        for marker in newly_crossed:
+            self.add_status(
+                Pain,
+                DependentCondition(lambda marker=marker: self.LeP.current < marker)
+            )
+
+
+    def heal(self, amount: int) -> None:
+        self.LeP.increase(amount)
+        if Pain in self.status_effects:
+            self.status_effects[Pain].check_validity(self)
+
+
 
     # TBD
     def events_at_turn(self):
@@ -144,11 +186,6 @@ class Creature(CreatureBase):
     def restore_resource(self, name: str, amount: int) -> None:
         self.get_resource(name).restore(amount)
 
-    def lose_hp(self, amount: int) -> None:
-        self.lose_resource("LeP", amount)
-
-    def heal(self, amount: int) -> None:
-        self.restore_resource("LeP", amount)
 
     def add_weapon(self, weapon: Weapon) -> None:
         self.weapons.append(weapon)
@@ -159,44 +196,6 @@ class Creature(CreatureBase):
 
 '''
 
-
-        # attributes
-        self.attributes = {
-            "MU": 14,
-            "KL": 12,
-            "IN": 13,
-            "CH": 8,
-            "FF": 8,
-            "GE": 8,
-            "KO": 8,
-            "KK": 8
-        }
-
-        self.resources = {
-            "LeP": 32,
-            "AsP": 20,
-            "KaP": 0
-        }
-
-        self.skills = {
-            "Klettern": 8,
-            "Sinnesschärfe": 10
-        }
-
-        # status values
-        self.LeP = 20
-        self.maxLeP = 20
-        self.AsP = 0
-        self.maxAsP = 0
-        self.KaP = 0
-        self.maxKaP = 0
-        self.SK = 2
-        self.ZK = 2
-        self.AW = 8
-        self.INI = 14
-        self.base_INI = 14
-        self.INI_bonus = '1W6'
-        self.GS = 8
 
         for k, v in kwargs.items():
             setattr(self, k, v)

@@ -37,11 +37,11 @@ def skill_check(creature: Creature, talent_name: str) -> int:
         mod (int): Modifikation der Probe. Negative Werte entsprechen einer Erschwerniss.
     """
 
-    talent = TalentDefinition.get[talent_name]
+    talent = TalentDefinition.get(talent_name)
 
     # modification due to status effects
     netto_mod = 0
-    for status_effect in creature.status_effects:
+    for status_effect in creature.status_effects.values():
         netto_mod += status_effect.get_modifier(talent).additive
     
     # character talent value
@@ -63,7 +63,7 @@ def skill_check(creature: Creature, talent_name: str) -> int:
 
     print('{0:} würfelt eine Probe auf {1:} mit einer Erschwerniss von {2:}.'.format(creature.name, talent.name, netto_mod))
     print("{0:}'s FW ist {1:}.".format(creature.name, talent_value))
-    print('Die relevanten Atribute sind {0:}/{1:}/{2:} = {3:}/{4:}/{5:}'.format(talent["attributes"][0], talent["attributes"][1], talent["attributes"][2], attributes[0], attributes[1], attributes[2]))
+    print('Die relevanten Atribute sind {0:}/{1:}/{2:} = {3:}/{4:}/{5:}'.format( talent.attributes[0].value, talent.attributes[1].value, talent.attributes[2].value, attributes[0], attributes[1], attributes[2]))
     print('Die Würfel zeigen: {0:} - {1:} - {2:}'.format(roll[0], roll[1], roll[2]))
     
     return quality_level(remaining)
