@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, auto
 import random
 from dataclasses import dataclass
 from typing import ClassVar
@@ -187,6 +187,30 @@ class Evasion(DerivedValue):
     @property
     def calculate(self):
         return int( self.creature.GE/2. )
+
     
+#_COMBAT_____________________________________________________________
 
+class DamageType(Enum):
+    PHYSICAL = auto()
+    MAGICAL = auto()
 
+@dataclass
+class Damage:
+    amount: int
+    type: DamageType
+
+@dataclass
+class DamageBonus: #TBD
+    attributes: list[str] = field(default_factory=list)
+    threshold: int | None = None
+
+@dataclass #TBD
+class AttackValue:
+    attributes: list[str] = field(default_factory=list)
+    threshold: int | None = None
+
+@dataclass #TBD
+class Parry:
+    attributes: list[str] = field(default_factory=list)
+    threshold: int | None = None

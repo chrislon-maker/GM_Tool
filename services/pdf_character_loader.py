@@ -1,6 +1,7 @@
 from PyPDF2 import PdfReader
 from models.creature import Creature
 from models.properties import Attribute, Resource, SoulPower, MovementSpeed, Toughness, Evasion, Initiative
+from models.equipment import WeaponType
 from services.checks import TalentDefinition
 import re
 
@@ -42,7 +43,6 @@ def get_int(data: dict, key: str, default: int = 0) -> int:
         return default
 
     return int(value)
-
 
 
 def load_character_from_pdf(pdf_path: str) -> Creature:
@@ -103,6 +103,29 @@ def load_character_from_pdf(pdf_path: str) -> Creature:
     # Talente
     for index, talent_name in enumerate(TalentDefinition.all().keys()):
         creature.talents[talent_name] = get_int(data, 'Talent_FW_{:}'.format(index+1))
+
+    # weapon skills
+    creature.weapon_skills[WeaponType.CROSSBOW] = get_int(data, "KT_FW_1")
+    creature.weapon_skills[WeaponType.BOW] = get_int(data, "KT_FW_2")
+    creature.weapon_skills[WeaponType.DAGGERS] = get_int(data, "KT_FW_3")
+    creature.weapon_skills[WeaponType.FENCING] = get_int(data, "KT_FW_4")
+    creature.weapon_skills[WeaponType.BLUNT] = get_int(data, "KT_FW_5")
+    creature.weapon_skills[WeaponType.CHAIN] = get_int(data, "KT_FW_6")
+    creature.weapon_skills[WeaponType.LANCE] = get_int(data, "KT_FW_7")
+    creature.weapon_skills[WeaponType.BRAWL] = get_int(data, "KT_FW_8")
+    creature.weapon_skills[WeaponType.SHIELD] = get_int(data, "KT_FW_9")
+    creature.weapon_skills[WeaponType.SWORD] = get_int(data, "KT_FW_10")
+    creature.weapon_skills[WeaponType.POLEARMS] = get_int(data, "KT_FW_11")
+    creature.weapon_skills[WeaponType.THROW] = get_int(data, "KT_FW_12")
+    creature.weapon_skills[WeaponType.BLUNT_2H] = get_int(data, "KT_FW_13")
+    creature.weapon_skills[WeaponType.SWORD_2H] = get_int(data, "KT_FW_14")
+    creature.weapon_skills[WeaponType.FIREBREATH] = get_int(data, "KT_FW_15")
+    creature.weapon_skills[WeaponType.WHIP] = get_int(data, "KT_FW_16")
+    creature.weapon_skills[WeaponType.SPIN] = get_int(data, "KT_FW_17")
+    creature.weapon_skills[WeaponType.BLOWGUN] = get_int(data, "KT_FW_18")
+    creature.weapon_skills[WeaponType.DISCUS] = get_int(data, "KT_FW_19")
+    creature.weapon_skills[WeaponType.FAN] = get_int(data, "KT_FW_20")
+    creature.weapon_skills[WeaponType.SKEWER] = get_int(data, "KT_FW_21")
     
     # Inventory
     creature.inventory = []

@@ -1,15 +1,9 @@
-from dataclasses import dataclass, field
-from typing import ClassVar
-from models.status_effect import StatusEffect, Pain, Confusion, Encumbrance, Paralysis, Fear, Stun
-from models.properties import TalentDefinition, Attribute
+from models.properties import TalentDefinition
 from models.creature import Creature
 import numpy as np
 import random
-import json
 
 
-class ActionBlockedError(Exception):
-    pass
 
 
 def quality_level(fp_left: int) -> int:
@@ -85,3 +79,89 @@ def check_on_crit(roll):
             return -2
     elif roll == 1:
         return 1
+
+
+class Report:
+    message: str = ''
+
+    def add_message(self, message: str) -> None:
+        self.message += '\n'+message
+
+def attack(attacker: Creature, weapon: Weapon, target: Creature | None = None, abilities: None = None) -> Report:
+    """
+    Führt einen Angriffswurf von <attacker> gegen <target> aus und nutzt dafür übergebene Waffen <weapon> und Sonderfertigkeiten <abilities>.
+    Wenn <target> = None wird nur ein Boolean fürs Gelingen der Probe zurückgegeben.
+    Sonst wird ein Verteidigungswurf von <target> ausgeführt und schaden zugefügt, sollte dieser misslingen.
+    """
+
+    if target is None:
+        report = Report(message = "{0:} greift mit {1:} an.".format(attacker.name, weapon.name))
+    else:
+        report = Report(message = "{0:} greift {1:} mit {2:} an.".format(attacker.name, target.name, weapon.name))
+
+    attack_value = weapon.attack_value.current
+
+    if isinstance(weapon, RangedWeapon):
+        distance = input("Wie groß ist die Ditanz? ")
+        report.add_message("Die Distanz beträgt {:} Schritt".format(distance))
+        if distance <= weapon.range[0]:
+            attack_value += 2
+            report.add_message("Schuss auf kurze Distanz!")
+        elif distance > weapon.range[1] and distance <= weapon.range[2]:
+            attack_value += -2
+            report.add_message("Schuss auf große Distanz!")
+        elif distance > 1.5*weapon.range[2]:
+            return report.add_message("Das Ziel ist außer Reichweite!")
+        else:
+            report.add_message("Schuss auf mittlere Distanz!")
+
+    # roll the dice
+    roll = random.randint(1, 20)
+    crit = True
+    if roll == 1:
+        confirmation_roll = random.randint(1, 20)
+        if confirmation_roll == 1:
+            report.add_message("{:} würfelt einen epischen Erfolg!".format(attacker.name))
+        elif confirmation_roll <= attack_value:
+            report.add_message("{:} würfelt einen krittischen Erfolg!".format(attacker.name))
+    elif roll <= attack_value:
+        crit = False
+        report.add_message("{:} trifft!".format(attacker.name))
+    else:
+        return report
+
+
+    # defense of target
+    if weapon.is_parryable and target is not None:
+        defence = target.AW
+
+        if isinstance(weapon, RangedWeapon):
+            for target_weapon in target.weapons:
+                if target_weapon.type is WeaponType.SHIELD and target_weapon.is_equipped: 
+                    defense = max(defense, target_weapon.parry.current)
+            if weapon.type is WeaponType.THROW:
+                defense -= 2
+            else:
+                defense -= 4
+        else: # if weapon is meele weapon
+            parry = max(target_weapon.parry.current for target_weapon in target.weapons if target_weapon.is_equipped)
+            defense = max(defense, parry)
+
+        defense -= 3 * target.defenses_in_this_round.value
+        target.defenses_in_this_round.increase()
+
+        if crit:
+            defense = defense // 2   
+
+        defense_roll = random.randint(1, 20)
+        defense_crit = True
+        if defense_roll <= defense:
+            report.add_message("Angriff wurde verteidigt")
+            return report
+
+    damage = attacker.weapon.roll_damage()
+
+    if target is not None:
+        target.get_damage(damage)
+        
+    return report

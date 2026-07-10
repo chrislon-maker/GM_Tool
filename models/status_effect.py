@@ -1,6 +1,15 @@
+from __future__ import annotations  # treat type hints as strings
+from typing import TYPE_CHECKING
+
+# import classes for type checking
+#if TYPE_CHECKING:
+#    from models.properties import Parry
+
+from models.properties import TalentDefinition, MovementSpeed, Initiative, Evasion, Parry, AttackValue
+
 from dataclasses import dataclass, field
-from models.properties import TalentDefinition, MovementSpeed
 from typing import ClassVar, Callable
+
 
 #__CONDITIONS AND COUNTERS_____________________________________________________________________
 
@@ -9,6 +18,9 @@ class Counter:
     Holds an integer which can be increased and decreases
     '''
     def __init__(self, value: int = 0):
+        self.value = value
+
+    def set_to(self, value: int = 0):
         self.value = value
 
     def increase(self, amount: int = 1):
@@ -110,10 +122,10 @@ class StatusEffect:
 
     @property
     def level(self) -> int:
-        self.check_validity()
+        self.update()
         return len(self.removal_conditions)
     
-    def check_validity(self):
+    def update(self) -> int:
         self.removal_conditions = [
             condition
             for condition in self.removal_conditions
@@ -185,7 +197,7 @@ class Encumbrance(StatusEffect):
 
 @dataclass
 class Pain(StatusEffect):
-    name = "Schmerz"
+    name: str = "Schmerz"
     affected_talents: str = "all"
 
     # modifies a current value of some derived property
@@ -201,7 +213,7 @@ class Pain(StatusEffect):
 
 @dataclass
 class Fear(StatusEffect):
-    name = "Furcht"
+    name: str = "Furcht"
     affected_talents: str = "all"
 
     # modifies a current value of some derived property
@@ -214,7 +226,7 @@ class Fear(StatusEffect):
 
 @dataclass
 class Confusion(StatusEffect):
-    name = "Verwirrung"
+    name: str = "Verwirrung"
     affected_talents: str = "all"
 
     # modifies a current value of some derived property
@@ -227,7 +239,7 @@ class Confusion(StatusEffect):
 
 @dataclass
 class Stun(StatusEffect):
-    name = "Betäubung"
+    name: str = "Betäubung"
     affected_talents: str = "all"
     removal_condition: ConditionCheck | None = None
 
@@ -241,7 +253,7 @@ class Stun(StatusEffect):
 
 @dataclass
 class Paralysis(StatusEffect):
-    name = "Paralyse"
+    name: str = "Paralyse"
     affected_talents: ClassVar[list[str]] = ["movement", "speech"]
 
     # modifies a current value of some derived property

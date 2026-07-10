@@ -2,29 +2,16 @@ from dataclasses import dataclass, field
 
 from models.species import Species
 from models.properties import Resource, DerivedValue, Attribute
-from models.weapon import Weapon
-from models.status_effect import StatusEffect, ConditionCheck
+from models.equipment import Weapon, Armor, DamageType, Damage
+from models.status_effect import StatusEffect, ConditionCheck, Pain, DependentCondition
 
 import numpy as np
 
 
 """
-def lose_hp(self, amount: int):
+TODO:
 
-def heal(self, amount: int):
-    ...
 
-def add_status(self, status: str):
-    ...
-
-def remove_status(self, status: str):
-    ...
-
-def roll_initiative(self):
-    ...
-
-def make_skill_check(self, talent: str):
-    ...
 """
 
 @dataclass
@@ -47,6 +34,7 @@ class CreatureBase:
 
     attributes: dict[str, int] = field(default_factory=dict)
     talents: dict[str, int] = field(default_factory=dict)
+    weapon_skills: dict[str, int] = field(default_factory=dict)
 
     LeP: Resource = field(default_factory=lambda: Resource(0))
     KaP: Resource = field(default_factory=lambda: Resource(0))
@@ -63,7 +51,8 @@ class CreatureBase:
     status_effects: dict = field(default_factory=dict)
 
     weapons: list[Weapon] = field(default_factory=list)
-    armor: list[dict] = field(default_factory=list)
+    armor: list[Armor] = field(default_factory=list)
+    defenses_in_this_round: Counter = Counter()
 
     advantages: list[str] = field(default_factory=list)
     disadvantages: list[str] = field(default_factory=list)
@@ -80,10 +69,14 @@ class CreatureBase:
 
 class Creature(CreatureBase):
     
-    def add_status(self, status_type: type[StatusEffect], removal_condition: ConditionCheck) -> None:
+    def add_status(self, status_type: type[StatusEffect], removal_condition: ConditionCheck, level: int = 1) -> None:
         if not status_type in self.status_effects:
             self.status_effects[status_type] = status_type()
-        self.status_effects[status_type].removal_conditions.append(removal_condition)
+        
+        # add #level references to the same removal_condition
+        # Consider changing this to adding multiple identical removal_conditions instead
+        for i in range(level):
+            self.status_effects[status_type].removal_conditions.append(removal_condition)
         
     def remove_invalid_status_effects(self) -> None:
         self.status_effects = [
@@ -136,23 +129,30 @@ class Creature(CreatureBase):
             5,
         ])
     
-    def get_damage(self, amount: int) -> None:
+    def get_damage(self, damage: Damage) -> None:
         pain_markers = self.pain_markers()
 
+        # check which pain level was present before damage received
         before = {
             marker for marker in pain_markers
             if self.LeP.current < marker
         }
 
-        self.LeP.decrease(amount)
+        # reduce damage by armor
+        for armor in self.armor:
+            damage = armor.reduce(damage)
 
+        # reduce LeP by the amount of unblocked damage
+        self.LeP.decrease(damage.amount)
+
+        # check which pain level was present before damage received
         after = {
             marker for marker in pain_markers
             if self.LeP.current < marker
         }
 
+        # check which LeP marks were crossed and add pain levels
         newly_crossed = after - before
-
         for marker in newly_crossed:
             self.add_status(
                 Pain,
@@ -163,7 +163,15 @@ class Creature(CreatureBase):
     def heal(self, amount: int) -> None:
         self.LeP.increase(amount)
         if Pain in self.status_effects:
-            self.status_effects[Pain].check_validity(self)
+            Pain.update()
+
+    def status_update(self) -> dict[str, int]:
+        output = {}
+        for status in self.status_effects.values():
+            output[status.name] = status.level
+        return output
+
+
 
 
 
