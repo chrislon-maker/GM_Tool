@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 #if TYPE_CHECKING:
 #    from models.properties import Parry
 
-from models.properties import TalentDefinition, MovementSpeed, Initiative, Evasion, Parry, AttackValue
+from models.properties import TalentDefinition, TalentTag, MovementSpeed, Initiative, Evasion, Parry, AttackValue
+from models.enums import *
 
 from dataclasses import dataclass, field
 from typing import ClassVar, Callable
@@ -107,13 +108,82 @@ class DependentCondition(ConditionCheck):
         return self.dependence()
 
 
-#__STATUS EFFECTS_____________________________________________________________________
+#__VALUE MODIFICATIONS_________________________________________________________________________
 
-@dataclass
+@dataclass(frozen=True)
 class ValueModifier:
+    '''
+    Handels a modifier that can be applied to a value
+    '''
     additive: int = 0
-    multiplicative: float = 0.0
+    multiplicative: float = 1.0
 
+    @property
+    def is_neutral(self) -> bool:
+        return (self.additive == 0 and self.multiplicative == 1.)
+
+    def apply(self, value: int) -> int:
+        return int((value + self.additive) * self.multiplicative)
+    
+    def combine(self, modifier: ValueModifier) -> ValueModifier:
+        return ValueModifier(
+            additive = self.additive + modifier.additive,
+            multiplicative = self.multiplicative * modifier.multiplicative
+            )
+    
+
+@dataclass(frozen=True)
+class ModifierContribution:
+    '''
+    Holds a ValueModifier and additional information about it like its source and a description for GUI
+    '''
+    modifier: ValueModifier
+    source_name: str
+    source: object | None = None
+    description: str | None = None
+
+
+@dataclass(frozen=True)
+class ModifierQuery:
+    '''
+    Holds all information about the value which is to be modified.
+    Used e.g. by the StatusEffect classes which require these information to calculate the correct ValueModifier 
+    '''
+    value_type: ValueType   # value to be modified
+    actor: Creature         # creature that value belongs to
+    tags: frozenset[ModifierTag] = frozenset()  # general tags and categories
+    subject: object | None = None       # Talent, Weapon usw. 
+    context: object | None = None       # context
+
+
+
+class StatusModifierResolver:
+    '''
+    Collects the ModifierContributions of all StatusEffect instances into a list 
+    '''
+    @staticmethod
+    def resolve(query: ModifierQuery) -> list[ModifierContribution]:
+
+        contributions: list[ModifierContribution] = []
+
+        for effect in query.creature.status_effects:
+            modifier = effect.get_modifier(query)
+
+            if not modifier.is_neutral:
+                contributions.append(
+                    ModifierContribution(
+                    modifier=modifier,
+                    source_name = effect.name,
+                    source = effect,
+                    description = "{0:} {1:}".format(effect.name, effect.level)
+                    )
+                )
+
+        return contributions
+    
+
+
+#__STATUS EFFECTS__________________________________________________________________________________
 
 @dataclass
 class StatusEffect:
@@ -142,54 +212,50 @@ class Encumbrance(StatusEffect):
     name: str = "Belastung"
 
     affected_talents: ClassVar[list[str]] = [
-        "Fliegen",
-        "Gaukeleien",
-        "Klettern",
-        "Körperbeherrschung",
-        "Kraftakt",
-        "Reiten",
-        "Schwimmen",
-        "Tanzen",
-        "Taschendiebstahl",
-        "Verbergen",
-        "Fährtensuchen",
-        "Tierkunde",
-        "Wildnisleben",
-        "Alchemie",
-        "Boote & Schiffe",
-        "Fahrzeuge",
-        "Heilkunde Gift",
-        "Heilkunde Krankheiten",
-        "Heilkunde Wunden",
-        "Holzbearbeitung",
-        "Lebensmittelverarbeitung",
-        "Lederverarbeitung",
-        "Malen & Zeichnen",
-        "Metallbearbeitung",
-        "Musizieren",
-        "Schlösserknacken",
-        "Steinbearbeitung",
-        "Stoffbearbeitung"
+        TalentTag.FLYING,
+        TalentTag.JUGGLING,
+        TalentTag.CLIMBING,
+        TalentTag.BODY_CONTROL,
+        TalentTag.FEAT_OF_STRENGTH,
+        TalentTag.RIDING,
+        TalentTag.SWIMMING,
+        TalentTag.DANCING,
+        TalentTag.PICKPOCKETING,
+        TalentTag.STEALTH,
+        TalentTag.TRACKING,
+        TalentTag.ZOOLOGY,
+        TalentTag.SURVIVAL,
+        TalentTag.ALCHEMY,
+        TalentTag.SEEFARING,
+        TalentTag.VEHICLES,
+        TalentTag.MEDICINE_POISSON,
+        TalentTag.MEDICINE_DISEASE,
+        TalentTag.MEDICINE_WOUNDS,
+        TalentTag.WOOD_CRAFTING,
+        TalentTag.COOKING,
+        TalentTag.FURRIER,
+        TalentTag.PAINTING,
+        TalentTag.BLACKSMITHING,
+        TalentTag.MUSIC,
+        TalentTag.PICKPOCKETING,
+        TalentTag.STONE_MASONRY,
+        TalentTag.TAYLORING
         ]
 
     # modifies a current value of some derived property
-    def get_modifier(self, property) -> ValueModifier:
-        if isinstance(property, MovementSpeed):
-            return ValueModifier(additive=-self.level)
+    def get_modifier(self, query: ModifierQuery) -> ValueModifier:
+        affected_values = {
+            ValueType.MOVEMENT_SPEED,
+            ValueType.INITIATIVE,
+            ValueType.EVASION,
+            ValueType.PARRY,
+            ValueType.MEELE_ATTACK
+        }
 
-        if isinstance(property, Initiative):
+        if query.value_type in affected_values:
             return ValueModifier(additive=-self.level)
         
-        if isinstance(property, Evasion):
-            return ValueModifier(additive=-self.level)
-        
-        if isinstance(property, AttackValue):
-            return ValueModifier(additive=-self.level)
-        
-        if isinstance(property, Parry):
-            return ValueModifier(additive=-self.level)
-        
-        if isinstance(property, TalentDefinition) and property.name in self.affected_talents:
+        if query.value_type is ValueType.TALENT_CHECK and query.subject.name in self.affected_talents:
             return ValueModifier(additive=-self.level)
 
         return ValueModifier()
@@ -201,12 +267,52 @@ class Pain(StatusEffect):
     affected_talents: str = "all"
 
     # modifies a current value of some derived property
-    def get_modifier(self, property) -> ValueModifier:
-        if isinstance(property, MovementSpeed):
+    def get_modifier(self, query: ModifierQuery) -> ValueModifier:
+        if query.value_type in [
+                ValueType.TALENT_CHECK,
+                ValueType.MEELE_ATTACK,
+                ValueType.MEELE_ATTACK,
+                ValueType.MOVEMENT_SPEED,
+                ValueType.PARRY,
+                ValueType.DODGE
+            ]:
             return ValueModifier(additive=-self.level)
 
-        if isinstance(property, TalentDefinition):
-            return ValueModifier(additive=-self.level)
+        return ValueModifier()
+    
+
+@dataclass
+class Blind(StatusEffect):
+    name: str = "Blind"
+    affected_talents: str = "all"
+
+    # modifies a current value of some derived property
+    def get_modifier(self, query: ModifierQuery) -> ValueModifier:
+        if self.level < 4:
+            if query.value_type in [
+                ValueType.TALENT_CHECK,
+                ValueType.MEELE_ATTACK,
+                ValueType.DEFENSE,
+                ValueType.PARRY,
+                ValueType.DODGE
+            ]:
+                return ValueModifier(additive=-self.level)
+            
+            if query.value_type in [
+                ValueType.RANGED_ATTACK
+            ]:
+                return ValueModifier(additive=-2*self.level)
+        else:
+            if query.value_type is ValueType.MEELE_ATTACK:
+                return ValueModifier(additive=0, multiplicative=0.5)
+            
+            if query.value_type in [
+                ValueType.RANGED_ATTACK,
+                ValueType.DEFENSE,
+                ValueType.PARRY,
+                ValueType.DODGE
+            ]:
+                return ValueModifier(additive=0, multiplicative=0.)
 
         return ValueModifier()
     
@@ -217,8 +323,8 @@ class Fear(StatusEffect):
     affected_talents: str = "all"
 
     # modifies a current value of some derived property
-    def get_modifier(self, property) -> ValueModifier:
-        if isinstance(property, TalentDefinition):
+    def get_modifier(self, query: ModifierQuery) -> ValueModifier:
+        if query.value_type is ValueType.TALENT_CHECK:
             return ValueModifier(additive=-self.level)
 
         return ValueModifier()
@@ -230,8 +336,8 @@ class Confusion(StatusEffect):
     affected_talents: str = "all"
 
     # modifies a current value of some derived property
-    def get_modifier(self, property) -> ValueModifier:
-        if isinstance(property, TalentDefinition):
+    def get_modifier(self, query: ModifierQuery) -> ValueModifier:
+        if query.value_type is ValueType.TALENT_CHECK:
             return ValueModifier(additive=-self.level)
 
         return ValueModifier()
@@ -241,11 +347,10 @@ class Confusion(StatusEffect):
 class Stun(StatusEffect):
     name: str = "Betäubung"
     affected_talents: str = "all"
-    removal_condition: ConditionCheck | None = None
 
     # modifies a current value of some derived property
-    def get_modifier(self, property) -> ValueModifier:
-        if isinstance(property, TalentDefinition):
+    def get_modifier(self, query: ModifierQuery) -> ValueModifier:
+        if query.value_type is ValueType.TALENT_CHECK:
             return ValueModifier(additive=-self.level)
 
         return ValueModifier()
@@ -254,15 +359,31 @@ class Stun(StatusEffect):
 @dataclass
 class Paralysis(StatusEffect):
     name: str = "Paralyse"
-    affected_talents: ClassVar[list[str]] = ["movement", "speech"]
 
     # modifies a current value of some derived property
-    def get_modifier(self, property) -> ValueModifier:
-        if isinstance(property, MovementSpeed):
+    def get_modifier(self, query: ModifierQuery) -> ValueModifier:
+        if query.value_type is ValueType.MOVEMENT_SPEED:
             return ValueModifier(multiplicative=-0.25*self.level)
 
-        if isinstance(property, TalentDefinition) and not set(self.affected_talents).isdisjoint(property.tags):
+        if query.value_type is ValueType.TALENT_CHECK and not set([ModifierTag.MOVEMENT, ModifierTag.SPEECH]).isdisjoint(query.subject.tags):
             return ValueModifier(additive=-self.level)
+        
+        return ValueModifier()
+    
+
+@dataclass
+class Confined(StatusEffect):
+    name: str = "Eingeengt"
+
+    # modifies a current value of some derived property
+    def get_modifier(self, query: ModifierQuery) -> ValueModifier:
+
+        if query.value_type in [ValueType.MEELE_ATTACK, ValueType.PARRY]:
+            weapon = query.subject
+            if weapon.type is WeaponType.SHIELD:
+                return ValueModifier(additive= -2 * (weapon.size + 1))
+            
+            return ValueModifier(additive= -4 * weapon.range )
         
         return ValueModifier()
 

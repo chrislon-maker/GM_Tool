@@ -67,6 +67,7 @@ def load_character_from_pdf(pdf_path: str) -> Creature:
     creature.species = get_str(data, 'Held_Spezies_Anzeige')
 
     creature.size = get_str(data, 'Held_Groesse')
+    creature.size_category = SizeCategory.MEDIUM
     creature.hair_color = get_str(data, 'Held_Haare')
     creature.eye_color = get_str(data, 'Held_Augen')
     creature.culture = get_str(data, 'Held_Kultur_Anzeige')

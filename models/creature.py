@@ -21,6 +21,7 @@ class CreatureBase:
     home: str = ""
     birthday: str = ""
     size: str = ""
+    size_category: str = ""
     hair_color: str = "" 
     eye_color: str = ""
     species: Species = field(default_factory=Species)

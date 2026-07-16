@@ -1,31 +1,17 @@
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import Enum, IntEnum, auto
 import random
 from dataclasses import dataclass
 from typing import ClassVar
 import json
 
-
-
-#__ATTRIBUTES________________________________________________________________________________
-
-class Attribute(Enum):
-    MU = "MU"
-    KL = "KL"
-    IN = "IN"
-    CH = "CH"
-    FF = "FF"
-    GE = "GE"
-    KO = "KO"
-    KK = "KK"
-
-
+from .enums import *
 
 #__TALENTS________________________________________________________________________________
 
 @dataclass(frozen=True)
 class TalentDefinition:
-    name: str
+    name: TalentTag
     attributes: tuple[Attribute, Attribute, Attribute]
     category: str
     tags: frozenset[str]
@@ -42,10 +28,10 @@ class TalentDefinition:
 
         cls._definitions = {
             name: cls(
-                name=name,
+                name=TalentTag(name),
                 attributes=tuple(Attribute[a] for a in data["attributes"]),
-                category=data["category"],
-                tags=frozenset(data.get("tags", [])),
+                category=ModifierTag(data["category"]),
+                tags=frozenset(ModifierTag(data.get("tags", []))),
             )
             for name, data in raw_data.items()
         }
@@ -103,37 +89,54 @@ class Resource:
 
 class DerivedValue:
     name: str = ""
+    value_type: ValueType | None = None
     maximum: int | float = float("inf")
     minimum: int | float = -float("inf")
 
-    def __init__(self, creature, base: int | None = None):
+    def __init__(self, creature, base: int | float | None = None):
         self.creature = creature
-        if base is None:
-            self.base = self.calculate
-        else:
-            self.base = base
+        self._base_override = base
+
+    @property
+    def base(self) -> int | float:
+        if self._base_override is not None:
+            return self._base_override
+
+        return self.calculate
 
     @property
     def calculate(self):
         return 0
+    
+    @property
+    def standard_query(self) -> ModifierQuery:
+        if self.value_type is None:
+            raise ValueError(
+                f"{type(self).__name__} besitzt keinen ValueType."
+            )
+        
+        return ModifierQuery(
+            value_type = self.value_type,
+            actor =  self.creature,  
+            subject = self
+        )
 
+    def modifications(self, query: ModifierQuery | None = None) -> list[ModifierContribution]:
+        query = query or self.standard_query
+        return StatusModifierResolver.resolve(query)
+    
     @property
     def current(self):
-        additive = 0
-        multiplier = 1.
-
-        for effect in self.creature.status_effects.values():
-            modifier = effect.get_modifier(self)
-            additive += modifier.additive
-            multiplier += modifier.multiplicative
-
-        current_value = (self.base + additive) * multiplier    
-        return min(self.maximum, max(self.minimum, current_value))
-    
+        modifier = ValueModifier()
+        for contribution in self.modifications():
+            modifier = modifier.combine(contribution.modifier)
+        return modifier.apply(self.base)
 
     
+
 class MovementSpeed(DerivedValue):
     name = "GS"
+    value_type = ValueType.MOVEMENT_SPEED
     minimum = 0
 
     @property
@@ -143,13 +146,17 @@ class MovementSpeed(DerivedValue):
 
 class SoulPower(DerivedValue):
     name = "SK"
+    value_type = ValueType.SOUL_POWER
 
     @property
     def calculate(self):
         return int( self.creature.culture.soul_power + (self.creature.MU + self.creature.KL + self.creature.IN)/6. )
     
+
+
 class Toughness(DerivedValue):
     name = "ZK"
+    value_type = ValueType.TOUGHNESS
 
     @property
     def calculate(self):
@@ -158,19 +165,16 @@ class Toughness(DerivedValue):
 
 class Initiative(DerivedValue):
     name = "INI"
+    value_type = ValueType.INITIATIVE
     minimum = 0
     bonus: int = 0
-
-    def __init__(self, creature, base: int | None = None):
-        self.creature = creature
-        if base is None:
-            self.base_flat = self.calculate
-        else:
-            self.base_flat = base
     
     @property
     def base(self):
-        return self.base_flat + self.bonus
+        if self._base_override is not None:
+            return self._base_override + self.bonus
+
+        return self.calculate + self.bonus
 
     def roll(self, die_sides: int = 6):
         self.bonus = random.randint(1, die_sides)
@@ -197,20 +201,145 @@ class DamageType(Enum):
 
 @dataclass
 class Damage:
+    value_type = ValueType.DAMAGE
     amount: int
     type: DamageType
+
+
+class AttackValue(DerivedValue):
+    minimum = 0
+
+    def __init__(
+        self,
+        creature: "Creature",
+        weapon: "Weapon",
+    ):
+        super().__init__(creature)
+        self.weapon = weapon
+
+    @property
+    def value_type(self) -> ValueType:
+        if isinstance(self.weapon, RangedWeapon):
+            return ValueType.RANGED_ATTACK
+
+        return ValueType.MELEE_ATTACK
+    
+    @property
+    def name(self) -> str:
+        if isinstance(self.weapon, RangedWeapon):
+            return "FK"
+
+        return "AT"
+
+    @property
+    def calculate(self) -> int:
+        return self.creature.weapon_skills[self.weapon.type]
+
+    def standard_query(self) -> ModifierQuery:
+        return ModifierQuery(
+            value_type=self.value_type,
+            actor=self.creature,
+            subject=self.weapon,
+        )
+    
+    def modifications(self, query: ModifierQuery | None = None) -> list[ModifierContribution]:
+        query = query or self.standard_query
+        weapon = query.weapon
+        creature = query.creature
+
+        # status effects
+        contributions = StatusModifierResolver.resolve(query)
+
+        # weapon it self
+        if isinstance(weapon, MeeleWeapon):
+            modifier = ValueModifier(additive = weapon.attack_modifier)
+            if not modifier.is_neutral:
+                contributions.append(
+                    ModifierContribution(
+                    modifier = modifier,   
+                    source_name = "Angriffsbonus",
+                    source = weapon,
+                    description = "Waffen AT-Bonus"             
+                    )
+                )
+
+        # attribute bonus
+        modifier = ValueModifier(additive = (creature.attribute.get(weapon.attack_attribute)-8)//3 )
+        if not modifier.is_neutral:
+            contributions.append(
+                ModifierContribution(
+                modifier = modifier,   
+                source_name = "Attributsbonus",
+                source = creature,
+                description = "{:}-Bonus".format(weapon.attack_attribute)             
+                )
+            )
+        return contributions
+
+
+class ParryValue(DerivedValue):
+    name = "PA"
+    value_type = ValueType.Parry
+    minimum = 0
+
+    def __init__(
+        self,
+        creature: "Creature",
+        weapon: "MeeleWeapon",
+    ):
+        super().__init__(creature)
+        self.weapon = weapon
+
+
+
+    @property
+    def calculate(self) -> int:
+        return self.creature.weapon_skills[self.weapon.type]//2
+
+    def standard_query(self) -> ModifierQuery:
+        return ModifierQuery(
+            value_type=self.value_type,
+            actor=self.creature,
+            subject=self.weapon,
+        )
+    
+    def modifications(self, query: ModifierQuery | None = None) -> list[ModifierContribution]:
+        query = query or self.standard_query
+        weapon = query.weapon
+        creature = query.creature
+
+        # status effects
+        contributions = StatusModifierResolver.resolve(query)
+
+        # weapon it self
+        if isinstance(weapon, MeeleWeapon):
+            modifier = ValueModifier(additive = weapon.parry_modifier)
+            if not modifier.is_neutral:
+                contributions.append(
+                    ModifierContribution(
+                    modifier = modifier,   
+                    source_name = "Paradebonus",
+                    source = weapon,
+                    description = "Waffen PA-Bonus"             
+                    )
+                )
+
+        # attribute bonus
+        attribute_name = max(weapon.damage_attributes, key=weapon.damage_attributes.get)
+        modifier = ValueModifier(additive = (creature.attribute.get(attribute_name, 8) - 8) // 3 )
+        if not modifier.is_neutral:
+            contributions.append(
+                ModifierContribution(
+                modifier = modifier,   
+                source_name = "Attributsbonus",
+                source = creature,
+                description = "{:}-Bonus".format(attribute_name)             
+                )
+            )
+        return contributions
 
 @dataclass
 class DamageBonus: #TBD
     attributes: list[str] = field(default_factory=list)
     threshold: int | None = None
 
-@dataclass #TBD
-class AttackValue:
-    attributes: list[str] = field(default_factory=list)
-    threshold: int | None = None
-
-@dataclass #TBD
-class Parry:
-    attributes: list[str] = field(default_factory=list)
-    threshold: int | None = None
