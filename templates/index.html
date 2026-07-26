@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Python Control Panel</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <script
+        src="{{ url_for('static', filename='app.js') }}"
+        defer
+    ></script>
+</head>
+
+
+
+<body>
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">GM-Tool</p>
+            <h1>Control Panel</h1>
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            Backend ready
+        </div>
+    </header>
+
+
+    <main class="page-layout">
+        
+        <aside class="actor-sidebar">
+
+            <div class="panel-header">
+                <h2>Akteure</h2>
+            </div>
+
+            <div class="actor-list">
+                <button class="actor-item">Anna</button>
+                <button class="actor-item">Ben</button>
+                <button class="actor-item">Carla</button>
+            </div>
+
+            <div class="button-row">
+                <button
+                    class="button button-primary"
+                    id="submit-button"
+                    type="submit"
+                >
+                    Add
+                </button>
+
+                <button
+                    class="button button-secondary"
+                    id="clear-button"
+                    type="button"
+                >
+                    Clear
+                </button>
+            </div>
+        </aside>
+        
+        <section class="panel main-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Character info</h2>
+                    <p>Send text to the Python backend.</p>
+                </div>
+            </div>
+
+            <div class="attribute-list">
+                <div><b>KL</b> 15</div>
+                <div><b>KL</b> 15</div>
+                <div><b>KL</b> 15</div>
+                <div><b>KL</b> 15</div>
+            </div>
+
+            <form id="process-form">
+                <div class="form-group">
+                    <label for="text-input">Input</label>
+
+                    <textarea
+                        id="text-input"
+                        name="text"
+                        rows="7"
+                        placeholder="Enter something for Python to process..."
+                    ></textarea>
+                </div>
+
+                <div class="button-row">
+                    <button
+                        class="button button-primary"
+                        id="submit-button"
+                        type="submit"
+                    >
+                        Run process
+                    </button>
+
+                    <button
+                        class="button button-secondary"
+                        id="clear-button"
+                        type="button"
+                    >
+                        Clear
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <aside class="side-column">
+            <section class="panel">
+                <h2>Tickers</h2>
+
+                <dl class="information-list">
+                    <div>
+                        <dt>Frontend</dt>
+                        <dd>Connected</dd>
+                    </div>
+
+                    <div>
+                        <dt>Backend</dt>
+                        <dd id="backend-status">Waiting</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section class="panel">
+                <h2>History</h2>
+
+                <div
+                    id="result"
+                    class="result-box"
+                    aria-live="polite"
+                >
+                    No result yet.
+                </div>
+            </section>
+        </aside>
+    </main>
+</body>
+</html>
