@@ -1,8 +1,8 @@
 from PyPDF2 import PdfReader
 from models.creature import Creature
-from models.properties import Attribute, Resource, SoulPower, MovementSpeed, Toughness, Evasion, Initiative
+from models.properties import Attribute, Resource, SoulPower, MovementSpeed, Toughness, Evasion, Initiative, TalentDefinition
 from models.equipment import WeaponType
-from services.checks import TalentDefinition
+from models.enums import SizeCategory
 import re
 
 

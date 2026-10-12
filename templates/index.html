@@ -1,151 +1,524 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="de" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
+    <!-- ensure correct scaling on differently sized screend -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1"
-    >
+    <title>DSA GM-Tool</title>
 
-    <title>Python Control Panel</title>
+    <!-- load bootstrap style -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}"
-    >
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-    <script
-        src="{{ url_for('static', filename='app.js') }}"
-        defer
-    ></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet">
+
+<style>
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.scroll-panel {
+    min-height: 0;
+    overflow-y: auto;
+    }
+
+.panel-container {
+    min-height: 0;
+    }
+
+.character-button {
+    --bs-btn-bg: transparent;
+    --bs-btn-color: #adb5bd;
+
+    --bs-btn-hover-bg: #293449;
+    --bs-btn-hover-color: white;
+
+    --bs-btn-active-bg: #3a465c;
+    --bs-btn-active-color: white;
+
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-border-color: transparent;
+
+    text-align: left;
+}
+
+.character-arrow {
+    display: inline-block;
+    width: 16px;
+    font-size: 1rem;
+    color: #779aff;
+    visibility: hidden;
+}
+
+.character-button.selected {
+    --bs-btn-bg: #30394a;
+    --bs-btn-color: white;
+
+    --bs-btn-hover-bg: #3a465c;
+    --bs-btn-hover-color: white;
+
+    --bs-btn-active-bg: #455575;
+
+    border-left: 3px solid #779aff;
+}
+
+.character-button.selected:hover,
+.character-button.selected:focus-visible,
+.character-button.selected:active {
+    border-left-color: #779aff;
+}
+
+.character-button.selected .character-arrow {
+    visibility: visible;
+}
+
+</style>
+
 </head>
 
 
+<body class="d-flex flex-column vh-100">
+    <div class="row px-3 mt-2">
+        <h4>DSA GM-Tool</h4>
+    </div>
 
-<body>
-    <header class="topbar">
-        <div>
-            <p class="eyebrow">GM-Tool</p>
-            <h1>Control Panel</h1>
-        </div>
-
-        <div class="status">
-            <span class="status-dot"></span>
-            Backend ready
-        </div>
-    </header>
+    <!-- container-fluid: adaptable area -->
+    <div class="container-fluid flex-grow-1 pb-3"
+        style="min-height: 0;">
+        <!-- 
+        row: one row
+        row-md-X: X rows to one area
+          -->
+        <div class="row gx-3 h-100">
 
 
-    <main class="page-layout">
-        
-        <aside class="actor-sidebar">
+            <!-- CHARAKTER MENUE COLUMN -->
+            <div class="col-md-2">
+                <!-- 
+                card = area with border   
+                card bg-body-tertiary: lighter grey
+                card bg-body-secondary: even lighter
+                card bg-secondary: lightest grey
+                -->
+                <div class="">
+                    <!-- horizontal rule -->
+                    <hr class="mb-2 mt-0">
 
-            <div class="panel-header">
-                <h2>Akteure</h2>
-            </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
 
-            <div class="actor-list">
-                <button class="actor-item">Anna</button>
-                <button class="actor-item">Ben</button>
-                <button class="actor-item">Carla</button>
-            </div>
+                        <h6 class="text-body-secondary mb-0">
+                            CHARAKTERE
+                        </h6>
 
-            <div class="button-row">
-                <button
-                    class="button button-primary"
-                    id="submit-button"
-                    type="submit"
-                >
-                    Add
-                </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary border-0"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addCharacterModal"
+                                title="Charakter hinzufügen"
+                                aria-label="Charakter hinzufügen">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
 
-                <button
-                    class="button button-secondary"
-                    id="clear-button"
-                    type="button"
-                >
-                    Clear
-                </button>
-            </div>
-        </aside>
-        
-        <section class="panel main-panel">
-            <div class="panel-header">
-                <div>
-                    <h2>Character info</h2>
-                    <p>Send text to the Python backend.</p>
+                    </div>
+
+                    <!-- BUTTONS: 
+                    btn-primary (blue), secondary (grey), success (green), danger (red), warning (yellow)  
+                    w-100: width 100% 
+                    btn-outline-secondary: only frame
+                    MARGINE OUTSIDE 
+                    m-X: X pixel margin on all sides
+                    mb-X: X pixel margin on bottom
+                    mt-X: X pixel margin on top
+                    ms-X: X pixel margin on left
+                    me-X: X pixel margin on right
+                    mx-X: X pixel margin on left and right
+                    my-X: X pixel margin on top and bottom 
+                    PADDING
+                    p-X: X pixel margin on all sides
+                    pb-X: X pixel margin on bottom
+                    pt-X: X pixel margin on top
+                    px-X: X pixel margin on left and right
+                    py-X: X pixel margin on top and bottom 
+                    -->
+                    <!-- 
+                    d-flex: created Flexbox 
+                    flex-column: columns are to be ordered flexible
+                    gap-X: distance between them is X
+                    -->
+                    <div class="d-flex flex-column gap-1" id="characterList">
+                        <!-- Character list is created below-->
+                    </div>
+
+
+                </div>
+            </div> <!-- END OF CHARAKTER MENUE COLUMN -->
+
+
+
+
+            <!-- second column of witdh 6 -->
+            <div class="col-md-8">
+                <div class="card bg-body-tertiary border-secondary rounded-3 h-100">
+                    <div class="card-body p-3">
+                        
+                        <div class="d-flex flex-column gap-1">
+                            <h2>Alrik</h2>
+
+                            <p>Lebenspunkte: 35</p>
+
+                            <button class="btn btn-danger btn-sm w-100">
+                                Attacke
+                            </button>
+
+                            <input type="number" class="form-control form-control-sm" value="0">
+
+                            <select class="form-select form-select-sm">
+                                <option>Alrik</option>
+                                <option>Ork</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="attribute-list">
-                <div><b>KL</b> 15</div>
-                <div><b>KL</b> 15</div>
-                <div><b>KL</b> 15</div>
-                <div><b>KL</b> 15</div>
-            </div>
 
-            <form id="process-form">
-                <div class="form-group">
-                    <label for="text-input">Input</label>
 
-                    <textarea
-                        id="text-input"
-                        name="text"
-                        rows="7"
-                        placeholder="Enter something for Python to process..."
-                    ></textarea>
-                </div>
+            <!-- third column of witdh 3 -->
+            <div class="col-md-2 h-100">
+                <div class="d-flex flex-column gap-3 h-100">
 
-                <div class="button-row">
-                    <button
-                        class="button button-primary"
-                        id="submit-button"
-                        type="submit"
-                    >
-                        Run process
+                    <!-- EVENTS -->
+                    <section class="d-flex flex-column flex-fill panel-container">
+
+                        <h6 class="text-body-secondary mb-2">EVENTS</h6>
+
+                        <div class="card bg-body-tertiary p-3 rounded-1 border-0 flex-grow-1 scroll-panel">
+                            <p>Keine Events</p>
+                        </div>
+                    </section>
+
+                    <!-- horizontal rule -->
+                    <hr class="my-0">
+
+
+                    <!-- LOG -->
+                    <section class="d-flex flex-column flex-fill panel-container">
+
+                        <h6 class="text-body-secondary mb-2">LOG</h6>
+
+                        <div class="card bg-body-tertiary p-3 rounded-1 border-0 flex-grow-1 scroll-panel">
+                            <p>Keine Aktionen</p>
+                        </div>
+                    </section>
+
+                </div> <!-- end of flex-row -->
+
+            </div> <!-- end of main column 3 -->
+
+        </div> <!-- end of row -->
+    </div> <!-- end of container-fluid -->
+
+
+
+<div class="modal fade" id="addCharacterModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Charakter hinzufügen
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Schließen">
+                </button>
+            </div> <!-- end header -->
+
+            <div class="modal-body">
+
+                <!-- import method selection window -->
+                <div id="characterImportMethodSelection" class="d-flex flex-column gap-2">
+
+                    <p class="text-body-secondary small mb-3">
+                        Wie möchtest du den Charakter erstellen?
+                    </p>
+    
+                    <!-- PDF -->
+                    <button type="button"
+                            class="btn btn-outline-secondary text-start p-3"
+                            id="addFromPdf">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0"><i class="bi bi-file-earmark-pdf me-2"></i>
+                            Aus PDF laden </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+
                     </button>
 
-                    <button
-                        class="button button-secondary"
-                        id="clear-button"
-                        type="button"
-                    >
-                        Clear
+                    <!-- Manuell -->
+                    <button type="button"
+                            class="btn btn-outline-secondary text-start p-3"
+                            id="addManually">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0"><i class="bi bi-pencil me-2"></i>
+                        Manuell erstellen </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+
                     </button>
+
+                    <!-- Website -->
+                    <button type="button"
+                            class="btn btn-outline-secondary text-start p-3"
+                            id="addFromWebsite">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0"><i class="bi bi-link-45deg me-2"></i>
+                        Von Website importieren </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+
+                    </button>
+
                 </div>
-            </form>
-        </section>
 
-        <aside class="side-column">
-            <section class="panel">
-                <h2>Tickers</h2>
 
-                <dl class="information-list">
-                    <div>
-                        <dt>Frontend</dt>
-                        <dd>Connected</dd>
+                <!-- import via PDF -->
+                 <div id="characterPDFSelection" class="d-flex flex-column gap-2 d-none">
+
+                    <h6>Aus PDF laden</h6>
+
+                    <label for="characterPDF" class="text-body-secondary small">
+                        Vorhandenen Charakter auswählen
+                    </label>
+
+                    <select class="form-select" id="characterPDF">
+                        <option value="">Bitte auswählen...</option>
+                    </select>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <hr class="flex-grow-1">
+                        <span class="text-body-secondary small">Nicht dabei?</span>
+                        <hr class="flex-grow-1">
                     </div>
 
                     <div>
-                        <dt>Backend</dt>
-                        <dd id="backend-status">Waiting</dd>
+                        <label for="characterPDFUpload" class="text-body-secondary small pb-2">
+                            PDF auf Computer suchen
+                        </label>
+
+                        <input type="file"
+                            class="form-control"
+                            id="characterPDFUpload"
+                            accept=".pdf,application/pdf">
                     </div>
-                </dl>
-            </section>
 
-            <section class="panel">
-                <h2>History</h2>
+                    <div class="d-flex justify-content-between align-items-center pt-3">
+                        <button class="btn btn-sm btn-outline-secondary" id="backToImportMethods" type="button">
+                            <i class="bi bi-arrow-left me-1"></i> 
+                            Zurück
+                        </button>
 
-                <div
-                    id="result"
-                    class="result-box"
-                    aria-live="polite"
-                >
-                    No result yet.
-                </div>
-            </section>
-        </aside>
-    </main>
+                        <button class="btn btn-sm btn-primary" id="importCharacterFromPDF">
+                            Character hinzufügen
+                        </button>
+                    </div>
+
+                 </div>
+
+            </div> <!-- end body -->
+
+        </div> <!-- end content -->
+    </div> <!-- end dialog -->
+</div> <!-- end modal -->
+
+
+
+
+<script> // executable scripts
+    // CHARACTER SELECTION
+    // Find all character buttons
+    const characterButtons = document.querySelectorAll(".character-button");
+
+    // Add a click listener to each button
+    characterButtons.forEach(button => {
+        button.addEventListener("click", () => {
+
+            // Remove selection from all characters
+            characterButtons.forEach(b => {
+                b.classList.remove("selected");
+                b.setAttribute("aria-pressed", "false");
+            });
+
+            // Select the clicked character
+            button.classList.add("selected");
+            button.setAttribute("aria-pressed", "true");
+        });
+    });
+
+
+    // CHARACTER IMPORT
+
+    // get modal
+    const addCharacterModal = document.getElementById("addCharacterModal");
+
+    // get contents
+    const ImportMethodSelection = document.getElementById("characterImportMethodSelection");
+
+    const CharacterPdfSelection = document.getElementById("characterPDFSelection");
+    //const ManuelCharacterForm = document.getElementById("manuelCharacterForm");
+    //const CharacterLinkInput = document.getElementById("characterLinkInput");
+
+    // get buttons
+    const AddFromPDFButton = document.getElementById("addFromPdf");
+    const BackToImportMethodsButton = document.getElementById("backToImportMethods");
+    const ImportCharacterFromPDFButton = document.getElementById("importCharacterFromPDF");
+    const characterPDFDropdown = document.getElementById("characterPDF");
+    const characterPDFUpload = document.getElementById("characterPDFUpload"); 
+
+    // load "import from PDF" - page
+    AddFromPDFButton.addEventListener("click", () => {
+        ImportMethodSelection.classList.add("d-none");
+        CharacterPdfSelection.classList.remove("d-none");
+
+        loadAvailablePDFs();
+    });
+
+    // go back to method selection page
+    BackToImportMethodsButton.addEventListener("click", () => {
+        CharacterPdfSelection.classList.add("d-none");
+        ImportMethodSelection.classList.remove("d-none");
+    });
+
+    // go back when closing modal
+    addCharacterModal.addEventListener("hidden.bs.modal", () => {
+        CharacterPdfSelection.classList.add("d-none");
+        ImportMethodSelection.classList.remove("d-none");
+    });
+
+    // fill PDF drop-down menue
+    async function loadAvailablePDFs() {
+        // calls the function get_character_pdfs() denoted by @app.get("/api/characters/pdfs") in app.py
+        const response = await fetch("/api/characters/pdfs");
+
+        // get file names form json
+        const pdfFiles = await response.json();
+
+        // replace the content of the drop down menue by this HTML
+        characterPDFDropdown.innerHTML = '<option value="">Bitte auswählen...</option>';
+
+        // create <option> objects and add them to the drop down
+        pdfFiles.forEach(filename => {
+            const option = document.createElement("option");
+
+            option.value = filename;
+            option.textContent = filename;
+
+            characterPDFDropdown.appendChild(option)
+        });
+    }
+ 
+    // reset PDF dropwodn when PDF is searched for by path
+    characterPDFUpload.addEventListener("change", () => {
+        if (characterPDFUpload.files.length > 0) {
+            characterPDFDropdown.value = "";
+        }
+    });
+
+    // reset PDF dropwodn when PDF is searched for by path
+    characterPDFDropdown.addEventListener("change", () => {
+        if (characterPDFDropdown.value != "") {
+            characterPDFUpload.value = "";
+        }
+    });
+
+    // character list
+    const characterList = document.getElementById("characterList")
+
+    async function addCharacter() {
+
+        // get file name form drop wodn
+        const filename = characterPDFDropdown.value
+
+        // check if it is empty
+        if (filename === "") {
+            alert("Bitte wähle zuerst eine PDF aus.");
+            return;
+        }
+
+        // call add_character() function and send data
+        try {
+            const response = await fetch("/api/character", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    filename: filename
+                })
+            });
+
+            // read output
+            const result = await response.json()
+
+            if (!responde.ok || !result.success) {
+                alert(result.error || "Der Charakter konnte nicht geladen werden.");
+                return;
+            }
+
+            // create character button
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.className = "btn btn-sm character-button w-100";
+            button.aria_pressed = "false";
+            button.dataset.characterId = result.character.id;
+            button.textContent = '<i class="bi bi-chevron-right character-arrow"></i>' + esult.character.name;
+
+            characterList.appendChild(button) 
+
+            // add message to console log
+            console.log("Charakter geladen:", character);
+
+            // 8. Modal schließen
+            const modalElement = document.getElementById("addCharacterModal");
+            const modal = bootstrap.Modal.getInstance(modalElement);
+
+            modal.hide();
+
+        } catch (error) {
+            console.error("Fehler beim Import:", error);
+            alert("Die Verbindung zum Server ist fehlgeschlagen.");
+        }
+        
+    };
+    // send loading request for character PDF
+    ImportCharacterFromPDFButton.addEventListener("click", addCharacter);
+
+</script>
+
+<!-- loads standard scripts from bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+
 </body>
+
 </html>

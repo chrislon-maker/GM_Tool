@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum, auto
+from .status_effect import ModifierQuery
 import random
 from dataclasses import dataclass
 from typing import ClassVar
