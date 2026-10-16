@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from models.creature import Creature
 
-from models.status_effect import DependentCondition, Encumbrance
+from models.status_effect import Encumbrance
+from models.modifiers import DependentCondition
 from models.properties import Attribute
-from models.enums import WeaponType, ValueType, MeeleWeaponRange, WhereEquipped, ShieldSize
+from models.enums import WeaponType, ValueType, MeleeWeaponRange, WhereEquipped, ShieldSize
 
 from dataclasses import dataclass, field
 import re, random
@@ -64,16 +65,16 @@ class Weapon:
 
 
 @dataclass
-class MeeleWeapon(Weapon):
+class MeleeWeapon(Weapon):
+    attack_type: ValueType = ValueType.MELEE_ATTACK
+
     attack_modifier: int = 0
     parry_modifier: int = 0
-
-    attack_type: ValueType.MEELE_ATTACK
 
     attack_attribute: Attribute = Attribute.MU
     damage_attribute: dict[Attribute: int] | None = None
 
-    range: MeeleWeaponRange | None = None
+    range: MeleeWeaponRange | None = None
     parry_weapon_bonus: int = 0
 
 @dataclass
@@ -89,7 +90,7 @@ class RangedWeapon(Weapon):
     range: list[int] = field(default_factory=list)
     munition: str | None = None
 
-    attack_type: ValueType.RANGED_ATTACK
+    attack_type: ValueType = ValueType.RANGED_ATTACK
     
 
 

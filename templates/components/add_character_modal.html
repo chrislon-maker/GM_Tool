@@ -1,0 +1,120 @@
+
+<div class="modal fade" id="addCharacterModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Charakter hinzufügen
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Schließen">
+                </button>
+            </div> <!-- end header -->
+
+            <div class="modal-body">
+
+                <!-- import method selection window -->
+                <div id="characterImportMethodSelection" class="d-flex flex-column gap-2">
+
+                    <p class="text-body-secondary small mb-3">
+                        Wie möchtest du den Charakter erstellen?
+                    </p>
+    
+                    <!-- PDF -->
+                    <button type="button"
+                            class="btn btn-outline-secondary text-start p-3"
+                            id="addFromPdf">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0"><i class="bi bi-file-earmark-pdf me-2"></i>
+                            Aus PDF laden </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+
+                    </button>
+
+                    <!-- Manuell -->
+                    <button type="button"
+                            class="btn btn-outline-secondary text-start p-3"
+                            id="addManually">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0"><i class="bi bi-pencil me-2"></i>
+                        Manuell erstellen </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+
+                    </button>
+
+                    <!-- Website -->
+                    <button type="button"
+                            class="btn btn-outline-secondary text-start p-3"
+                            id="addFromWebsite">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0"><i class="bi bi-link-45deg me-2"></i>
+                        Von Website importieren </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+
+                    </button>
+
+                </div>
+
+
+                <!-- import via PDF -->
+                 <div id="characterPDFSelection" class="d-flex flex-column gap-2 d-none">
+
+                    <h6>Aus PDF laden</h6>
+
+                    <label for="characterPDF" class="text-body-secondary small">
+                        Vorhandenen Charakter auswählen
+                    </label>
+
+                    <select class="form-select" id="characterPDF">
+                        <option value="">Bitte auswählen...</option>
+                    </select>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <hr class="flex-grow-1">
+                        <span class="text-body-secondary small">Nicht dabei?</span>
+                        <hr class="flex-grow-1">
+                    </div>
+
+                    <div>
+                        <label for="characterPDFUpload" class="text-body-secondary small pb-2">
+                            PDF auf Computer suchen
+                        </label>
+
+                        <input type="file"
+                            class="form-control"
+                            id="characterPDFUpload"
+                            accept=".pdf,application/pdf">
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3">
+                        <button class="btn btn-sm btn-outline-secondary" id="backToImportMethods" type="button">
+                            <i class="bi bi-arrow-bar-left me-1"></i> Zurück
+                        </button>
+
+                        <button class="btn btn-sm btn-primary" id="importCharacterFromPDF">
+                            Character hinzufügen
+                        </button>
+                    </div>
+
+                 </div>
+
+            </div> <!-- end body -->
+
+        </div> <!-- end content -->
+    </div> <!-- end dialog -->
+</div> <!-- end modal -->

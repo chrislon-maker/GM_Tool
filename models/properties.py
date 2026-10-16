@@ -1,6 +1,7 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum, auto
-from .status_effect import ModifierQuery
+from models.modifiers import ValueModifier, ModifierQuery, DerivedValue
 import random
 from dataclasses import dataclass
 from typing import ClassVar
@@ -14,8 +15,8 @@ from .enums import *
 class TalentDefinition:
     name: TalentTag
     attributes: tuple[Attribute, Attribute, Attribute]
-    category: str
-    tags: frozenset[str]
+    category: ModifierTag
+    tags: frozenset[ModifierTag]
 
     _definitions: ClassVar[dict[str, "TalentDefinition"] | None] = None
 
@@ -32,7 +33,7 @@ class TalentDefinition:
                 name=TalentTag(name),
                 attributes=tuple(Attribute[a] for a in data["attributes"]),
                 category=ModifierTag(data["category"]),
-                tags=frozenset(ModifierTag(data.get("tags", []))),
+                tags=frozenset(ModifierTag(tag) for tag in data.get("tags", [])),
             )
             for name, data in raw_data.items()
         }
@@ -86,54 +87,7 @@ class Resource:
             self.current = min(self.maximum, self.current + amount)
 
 
-#__DERIVED VALUES__________________________________________________________________________
-
-class DerivedValue:
-    name: str = ""
-    value_type: ValueType | None = None
-    maximum: int | float = float("inf")
-    minimum: int | float = -float("inf")
-
-    def __init__(self, creature, base: int | float | None = None):
-        self.creature = creature
-        self._base_override = base
-
-    @property
-    def base(self) -> int | float:
-        if self._base_override is not None:
-            return self._base_override
-
-        return self.calculate
-
-    @property
-    def calculate(self):
-        return 0
-    
-    @property
-    def standard_query(self) -> ModifierQuery:
-        if self.value_type is None:
-            raise ValueError(
-                f"{type(self).__name__} besitzt keinen ValueType."
-            )
-        
-        return ModifierQuery(
-            value_type = self.value_type,
-            actor =  self.creature,  
-            subject = self
-        )
-
-    def modifications(self, query: ModifierQuery | None = None) -> list[ModifierContribution]:
-        query = query or self.standard_query
-        return StatusModifierResolver.resolve(query)
-    
-    @property
-    def current(self):
-        modifier = ValueModifier()
-        for contribution in self.modifications():
-            modifier = modifier.combine(contribution.modifier)
-        return modifier.apply(self.base)
-
-    
+#__DERIVED VALUES__________________________________________________________________________    
 
 class MovementSpeed(DerivedValue):
     name = "GS"
@@ -252,7 +206,7 @@ class AttackValue(DerivedValue):
         contributions = StatusModifierResolver.resolve(query)
 
         # weapon it self
-        if isinstance(weapon, MeeleWeapon):
+        if isinstance(weapon, MeleeWeapon):
             modifier = ValueModifier(additive = weapon.attack_modifier)
             if not modifier.is_neutral:
                 contributions.append(
@@ -280,13 +234,13 @@ class AttackValue(DerivedValue):
 
 class ParryValue(DerivedValue):
     name = "PA"
-    value_type = ValueType.Parry
+    value_type = ValueType.PARRY
     minimum = 0
 
     def __init__(
         self,
         creature: "Creature",
-        weapon: "MeeleWeapon",
+        weapon: "MeleeWeapon",
     ):
         super().__init__(creature)
         self.weapon = weapon
@@ -313,7 +267,7 @@ class ParryValue(DerivedValue):
         contributions = StatusModifierResolver.resolve(query)
 
         # weapon it self
-        if isinstance(weapon, MeeleWeapon):
+        if isinstance(weapon, MeleeWeapon):
             modifier = ValueModifier(additive = weapon.parry_modifier)
             if not modifier.is_neutral:
                 contributions.append(

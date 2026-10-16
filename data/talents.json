@@ -204,12 +204,12 @@
         "category": "knowledge",
         "tags": []
         },
-    "Sternkunde": { 
+    "Sternenkunde": { 
         "attributes": ["KL", "KL", "IN"],
         "category": "knowledge",
         "tags": []
         },
-    "Alchimie": { 
+    "Alchemie": { 
         "attributes": ["MU", "KL", "FF"],
         "category": "crafting",
         "tags": ["encumbrance"]

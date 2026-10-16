@@ -31,11 +31,45 @@ def get_character_pdfs():
     return jsonify(sorted(pdf_files))
 
 
+# create a compact JSON with relevant data for frontend
+@app.get("/api/characters/<characterId>")
+def get_character(characterId):
+    creature = loaded_characters.get(characterId)
+
+    if characterId not in loaded_characters.keys():
+        return jsonify({
+            "success": False,
+            "error": "Charakter nicht gefunden."
+        }), 404
+
+    return jsonify({
+            "success": True,
+            "character": {
+                "id": characterId,
+                "name": creature.name,
+                "profession": creature.profession,
+                "species": creature.species,
+                "gender": creature.gender,
+                "attributes": creature.attributes,
+                "Lep_current": creature.LeP.current,
+                "Lep_maximum": creature.LeP.maximum,
+                "Asp_current": creature.AsP.current,
+                "Asp_maximum": creature.AsP.maximum,
+                "Kap_current": creature.KaP.current,
+                "Kap_maximum": creature.KaP.maximum,
+                "GS_current": creature.GS.current,
+                "ZK_current": creature.ZK.current,
+                "SK_current": creature.SK.current,
+                "INI_current": creature.INI.current,
+            }
+        })
+
+
 @app.post("/api/characters")
 def add_character():
 
     # get value of key "filename" form the json file
-    data = request.get_json("filename")
+    data = request.get_json(silent=True)
     if not data or not data.get("filename"):
         return jsonify({
             "success": False,
@@ -80,6 +114,22 @@ def add_character():
             "name": creature.name
         }
     })
+
+
+@app.delete("/api/characters/<character_id>")
+def delete_character(character_id):
+
+    if character_id not in loaded_characters.keys():
+        return jsonify({
+            "success": False,
+            "error": "Charakter nicht gefunden."
+        }), 404
+
+    del loaded_characters[character_id]
+
+    return jsonify({
+        "success": True
+    })      
 
 
 # only POST requests (send data to server)

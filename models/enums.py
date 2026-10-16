@@ -25,7 +25,7 @@ class WeaponType(Enum):
     SWORD_2H = "Zweihandschwert"
 
 
-class MeeleWeaponRange(IntEnum):
+class MeleeWeaponRange(IntEnum):
     SHORT = 0
     MEDIUM = 1
     LONG = 2
@@ -34,10 +34,10 @@ class MeeleWeaponRange(IntEnum):
     @property
     def label(self):
         return {
-            MeeleWeaponRange.SHORT: "kurz",
-            MeeleWeaponRange.MEDIUM: "mittel",
-            MeeleWeaponRange.LONG: "lang",
-            MeeleWeaponRange.OVERLONG: "überlang",
+            MeleeWeaponRange.SHORT: "kurz",
+            MeleeWeaponRange.MEDIUM: "mittel",
+            MeleeWeaponRange.LONG: "lang",
+            MeleeWeaponRange.OVERLONG: "überlang",
         }[self]
     
 
@@ -49,9 +49,9 @@ class ShieldSize(IntEnum):
     @property
     def label(self):
         return {
-            MeeleWeaponRange.SMALL: "kleiner Schild",
-            MeeleWeaponRange.MEDIUM: "mittelerer Schild",
-            MeeleWeaponRange.LARGE: "großer Schild",
+            MeleeWeaponRange.SMALL: "kleiner Schild",
+            MeleeWeaponRange.MEDIUM: "mittelerer Schild",
+            MeleeWeaponRange.LARGE: "großer Schild",
         }[self]
 
 class WhereEquipped(Enum):
@@ -142,7 +142,7 @@ class TalentTag(Enum):
     MEDICINE_DISEASE = "Heilkunde Krankheiten"
     MEDICINE_MIND = "Heilkunde Seele"
     MEDICINE_WOUNDS = "Heilkunde Wunden" 
-    WOOD_CRAFTING = "Hoilzbearbeitung"
+    WOOD_CRAFTING = "Holzbearbeitung"
     COOKING = "Lebensmittelbearbeitung"
     FURRIER = "Lederbearbeitung"
     PAINTING = "Malen & Zeichnen"
@@ -172,17 +172,21 @@ class ValueType(Enum):
 
 
 class ModifierTag(Enum):
-    PHYSICAL = auto()
-    MENTAL = auto()
-    SOCIAL = auto()
+    PHYSICAL = "physical"
+    MENTAL = "mental"
+    SOCIAL = "social"
+    KNOWLEDGE = "knowledge"
+    CRAFTING = "crafting"
 
-    COMBAT = auto()
-    ATTACK = auto()
-    DEFENSE = auto()
-    MELEE = auto()
-    RANGED = auto()
+    COMBAT = "combat"
+    ATTACK = "attack"
+    DEFENSE = "defense"
+    MELEE = "melee"
+    RANGED = "ranged"
 
-    MOVEMENT = auto()
-    SPEECH = auto()
-    CRAFT = auto()
-    NATURE = auto()
+    MOVEMENT = "movement"
+    ENCUMBRANCE = "encumbrance"
+    SPEECH = "speech"
+    CRAFT = "craft"
+    NATURE = "nature"
+    CONCENTRATION = "concentration"

@@ -3,7 +3,8 @@ from dataclasses import dataclass, field
 from models.species import Species
 from models.properties import Resource, DerivedValue, Attribute
 from models.equipment import Weapon, Armor, DamageType, Damage
-from models.status_effect import StatusEffect, ConditionCheck, Pain, DependentCondition
+from models.status_effect import StatusEffect, ConditionCheck, Pain
+from models.modifiers import DependentCondition, Counter
 
 import numpy as np
 

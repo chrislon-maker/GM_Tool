@@ -1,0 +1,308 @@
+<!-- Symbols:
+cash-coin : money
+chat-dots 
+dash-circle
+droplet
+fingerprint
+fire
+forward-fill
+backward-fill
+gender-female
+gender-male
+hourglass
+leaf
+-->
+
+
+<div class="card bg-body-tertiary border-secondary rounded-3 h-100">
+    <div class="card-body p-3">
+
+
+        <!-- create character sheet template to fill by  updateCharacter() --> 
+        <div class="d-flex flex-column gap-2" id="characterSheet">
+
+            <div class="d-flex align-items-center mb-1 flex-wrap">
+                <!-- Name -->
+                <h4 class="fw-bold text-white mb-0" id="characterName">Alrik</h4>  
+
+                <!-- Separator -->
+                <span class="text-body-secondary ms-1 me-1"> | </span>
+                <!-- Short Information -->
+                <small class="text-body-secondary" id="characterSpecies"><i class="bi bi-gender-male"></i> Mensch · Krieger </small> 
+
+
+                <!-- Toggle fluff -->
+                <button
+                    class="btn btn-sm btn-outline-secondary border-0 ms-auto"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#characterFluff"
+                    aria-expanded="false"
+                    aria-controls="characterFluff"
+                    id="fluffDropDownButton">
+
+                    <i class="bi bi-caret-down-fill"></i>
+                </button>
+                
+            </div>
+
+            <!-- Collapsible fluff information -->
+            <div class="collapse my-0" id="characterFluff">
+                <div class="card card-body bg-body-secondary border-0">
+                    <small class="text-body-secondary">Familienname: von Falkenstein</small>
+                    <small class="text-body-secondary">Geboren: 1002 BF</small>
+                    <small class="text-body-secondary">Heimat: Gareth</small>
+                </div>
+            </div>
+
+            <hr class="my-0"> <!-- Eigenschaften -->
+
+            <h5>Eigenschaften</h5>
+            <div class="row row-cols-8 g-2">
+
+                <!-- Courage / MU -->
+                <div class="col">
+                    <div class="card card-body bg-body-secondary border-0  p-2 rounded-3 mb-2">
+
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="my-yellow my-text fs-3 fw-bold"><i class="bi bi-shield my-yellow"></i> 14 </span> 
+                            <small class="small text-secondary">MU</small>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Cleverness / KL -->
+                <div class="col">
+                    <div class="card card-body bg-body-secondary border-0 p-2 rounded-3 mb-2">
+
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="my-text my-purple fs-3 fw-bold"><i class="bi bi-lightbulb my-purple"></i> 14 </span> 
+                            <small class="small text-secondary">KL</small>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Intuition / IN -->
+                <div class="col">
+                    <div class="card card-body bg-body-secondary border-0 p-2 rounded-3 mb-2">
+
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="my-text my-blue fs-3 fw-bold"><i class="bi bi-eye my-purple"></i> 14 </span> 
+                            <small class="small text-secondary">IN</small>
+                        </div>
+                        
+
+                    </div>
+                </div>
+
+                <!-- Charisma / CH -->
+                <div class="col">
+                    <div class="card card-body bg-body-secondary border-0 p-2 rounded-3 mb-2">
+
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="my-text my-pink fs-3 fw-bold"><i class="bi bi-people my-pink"></i> 14 </span> 
+                            <small class="small text-secondary">CH</small>
+                        </div>
+                        
+
+                    </div>
+                </div>
+
+                <!-- Fingerfertigkeit / FF -->
+                <div class="col">
+                    <div class="card card-body bg-body-secondary border-0 p-2 rounded-3 mb-2">
+
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="my-teal my-text fs-3 fw-bold"><i class="bi bi-hand-index-thumb my-teal my-text"></i> 14 </span> 
+                            <small class="small text-secondary">FF</small>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Geschicklichkeit / GE -->
+                <div class="col">
+                    <div class="card card-body bg-body-secondary border-0 p-2 rounded-3 mb-2">
+
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="my-text my-green fs-3 fw-bold"><i class="bi bi-lightning my-green"></i> 14 </span> 
+                            <small class="small text-secondary">GE</small>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+
+                <!-- Konstitution / KO -->
+                <div class="col">
+                    <div class="card card-body bg-body-secondary border-0 p-2 rounded-3 mb-2">
+
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="my-text my-orange fs-3 fw-bold"><i class="bi bi-heart-pulse my-orange"></i> 14 </span> 
+                            <small class="small text-secondary">KO</small>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                
+                <!-- Körperkraft / KK -->
+                <div class="col">
+                    <div class="card card-body bg-body-secondary border-0 p-2 rounded-3 mb-2">
+
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="my-text my-red fs-3 fw-bold"><i class="bi bi-hammer my-red"></i> 14 </span> 
+                            <small class="small text-secondary">KK</small>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+
+            </div>
+
+
+            <hr class="my-0">  
+            
+            <div class="row gx-3 h-100">
+
+                <!-- BALKEN -->
+                <div class="col-md-9">
+    
+                    <div class="d-flex justify-content-between mb-1">
+                        <div><span>Lebenspunkte</span><small class="text-secondary"> (LeP)</small></div>
+                        <span id="lepText" class="fw-semibold">31 / 38</span>
+                    </div>
+        
+                    <div class="progress mb-2"
+                        role="progressbar"
+                        aria-label="Lebenspunkte"
+                        aria_valuenow="31"
+                        aria-valuemin="0"
+                        aria-valuemax="38"
+                        style="height: 12px;">
+                        <div class="progress-bar"
+                            id="lepBar"
+                            style="width: 81.6%;
+                            background-color: color-mix(in srgb, var(--my-green) 75%, transparent);">
+                        </div>
+                    </div>
+        
+                    <div class="d-flex justify-content-between mb-1">
+                        <div><span>Astralpunkte</span><small class="text-secondary"> (AsP)</small></div>
+                        <span id="aspText" class="fw-semibold">31 / 38</span>
+                    </div>
+        
+                    <div class="progress mb-2"
+                        role="progressbar"
+                        aria-label="Astralpunkte"
+                        aria_valuenow="31"
+                        aria-valuemin="0"
+                        aria-valuemax="38"
+                        style="height: 12px;">
+                        <div class="progress-bar"
+                            id="aspBar"
+                            style="width: 81.6%;
+                                background-color: color-mix(in srgb, var(--my-teal) 75%, transparent);
+                            ">
+                        </div>
+                    </div>
+        
+                    <div class="d-flex justify-content-between mb-1">
+                        <div><span>Karmalpunkte</span><small class="text-secondary"> (KaP)</small></div>
+                        <span id="kapText" class="fw-semibold"> -</span>
+                    </div>
+        
+                    <div class="progress"
+                        role="progressbar"
+                        aria-label="Astralpunkte"
+                        aria_valuenow="31"
+                        aria-valuemin="0"
+                        aria-valuemax="38"
+                        style="height: 12px;">
+                        <div class="progress-bar"
+                            id="kapBar"
+                            style="width: 81.6%;
+                            background-color: color-mix(in srgb, var(--my-orange) 75%, transparent);">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATUS EFFECTS -->
+                <div class="col-md-3">
+                    <div class="d-flex flex-column h-100">
+                        <span class="text-spanody-secondary">STATUSEFFEKTE</span>
+                        <div class="card card-body bg-body-secondary border-0 p-2 rounded-3 flex-grow-1">
+                            <span class="text-secondary">keine Effekte aktiv...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <hr class="my-0"> <!-- Vor / Nachteile-->
+
+            <!-- ADVANTAGES / DISADVANTAGES -->
+            <div class="row g-3 mt-3">
+
+                <!-- Advantages -->
+                <div class="col-6">
+
+                    <h6 class="text-success">
+                        <i class="bi bi-plus-circle"></i>
+                        Vorteile
+                    </h6>
+
+                    <div class="advantage-item rounded p-2 mb-2">
+                        Eisern
+                    </div>
+
+                    <div class="advantage-item rounded p-2 mb-2">
+                        Hohe Lebenskraft
+                    </div>
+
+                </div>
+
+                <!-- Disadvantages -->
+                <div class="col-6">
+
+                    <h6 class="text-danger">
+                        <i class="bi bi-dash-circle"></i>
+                        Nachteile
+                    </h6>
+
+                    <div class="disadvantage-item rounded p-2 mb-2">
+                        Neugier
+                    </div>
+
+                    <div class="disadvantage-item rounded p-2 mb-2">
+                        Höhenangst
+                    </div>
+
+                </div>
+
+            </div>
+            
+
+
+
+            <button class="btn btn-danger btn-sm w-100">
+                Attacke
+            </button>
+
+            <input type="number" class="form-control form-control-sm" value="0">
+
+            <select class="form-select form-select-sm">
+                <option>Alrik</option>
+                <option>Ork</option>
+            </select>
+
+        </div>
+
+
+
+
+    </div> <!-- END OF CARD -->
+</div>
