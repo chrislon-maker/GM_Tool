@@ -13,12 +13,12 @@ from .enums import *
 
 @dataclass(frozen=True)
 class TalentDefinition:
-    name: TalentTag
+    name: TalentId
     attributes: tuple[Attribute, Attribute, Attribute]
-    category: ModifierTag
+    category: TalentTypes
     tags: frozenset[ModifierTag]
 
-    _definitions: ClassVar[dict[str, "TalentDefinition"] | None] = None
+    _definitions: ClassVar[dict[TalentId, "TalentDefinition"] | None] = None
 
     @classmethod
     def load_all(cls) -> None:
@@ -28,15 +28,15 @@ class TalentDefinition:
         with open("data/talents.json", encoding="utf-8") as f:
             raw_data = json.load(f)
 
-        cls._definitions = {
-            name: cls(
-                name=TalentTag(name),
-                attributes=tuple(Attribute[a] for a in data["attributes"]),
-                category=ModifierTag(data["category"]),
-                tags=frozenset(ModifierTag(tag) for tag in data.get("tags", [])),
-            )
-            for name, data in raw_data.items()
-        }
+        cls._definitions = {}
+        for category in raw_data.keys():
+            for name, data in raw_data[category].items():
+                cls._definitions[TalentId(name)] = cls(
+                    name=TalentId(name),
+                    attributes=tuple(Attribute[a] for a in data["attributes"]),
+                    category=TalentTypes(category),
+                    tags=frozenset(ModifierTag(tag) for tag in data.get("tags", [])),
+                )
 
     @classmethod
     def get(cls, name: str) -> "TalentDefinition":
@@ -51,7 +51,7 @@ class TalentDefinition:
         return cls._definitions[name]
 
     @classmethod
-    def all(cls) -> dict[str, "TalentDefinition"]:
+    def all(cls) -> dict[TalentId, "TalentDefinition"]:
         cls.load_all()
 
         if cls._definitions is None:
@@ -70,6 +70,9 @@ class Resource:
         self.current = initial
         self.maximum = maximum
         self.minimum = minimum
+
+    def set_to(self, value: int):
+        self.current = value
 
     def reset(self):
         self.current = self.initial
@@ -91,7 +94,7 @@ class Resource:
 
 class MovementSpeed(DerivedValue):
     name = "GS"
-    value_type = ValueType.MOVEMENT_SPEED
+    value_type = ValueId.MOVEMENT_SPEED
     minimum = 0
 
     @property
@@ -101,7 +104,7 @@ class MovementSpeed(DerivedValue):
 
 class SoulPower(DerivedValue):
     name = "SK"
-    value_type = ValueType.SOUL_POWER
+    value_type = ValueId.SOUL_POWER
 
     @property
     def calculate(self):
@@ -111,7 +114,7 @@ class SoulPower(DerivedValue):
 
 class Toughness(DerivedValue):
     name = "ZK"
-    value_type = ValueType.TOUGHNESS
+    value_type = ValueId.TOUGHNESS
 
     @property
     def calculate(self):
@@ -120,7 +123,7 @@ class Toughness(DerivedValue):
 
 class Initiative(DerivedValue):
     name = "INI"
-    value_type = ValueType.INITIATIVE
+    value_type = ValueId.INITIATIVE
     minimum = 0
     bonus: int = 0
     
@@ -156,7 +159,7 @@ class DamageType(Enum):
 
 @dataclass
 class Damage:
-    value_type = ValueType.DAMAGE
+    value_type = ValueId.DAMAGE
     amount: int
     type: DamageType
 
@@ -173,11 +176,11 @@ class AttackValue(DerivedValue):
         self.weapon = weapon
 
     @property
-    def value_type(self) -> ValueType:
+    def value_type(self) -> ValueId:
         if isinstance(self.weapon, RangedWeapon):
-            return ValueType.RANGED_ATTACK
+            return ValueId.RANGED_ATTACK
 
-        return ValueType.MELEE_ATTACK
+        return ValueId.MELEE_ATTACK
     
     @property
     def name(self) -> str:
@@ -234,7 +237,7 @@ class AttackValue(DerivedValue):
 
 class ParryValue(DerivedValue):
     name = "PA"
-    value_type = ValueType.PARRY
+    value_type = ValueId.PARRY
     minimum = 0
 
     def __init__(

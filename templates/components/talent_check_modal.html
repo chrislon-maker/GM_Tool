@@ -1,0 +1,391 @@
+<!-- TALENT CHECK MODAL -->
+<!-- functions in js/character_tableau.js -->
+
+<div class="modal fade" id="TalentCheckModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Talent Probe
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Schließen">
+                </button>
+            </div> <!-- end header -->
+
+            <div class="modal-body">
+
+                <!-- category selection window -->
+                <div id="TalentCategorySelection" class="d-flex flex-column gap-2">
+
+                    <p class="text-body-secondary small mb-3">
+                        Zu welcher Kategorie gehört das Talent?
+                    </p>
+    
+                    <!-- Körpertalente -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text my-red text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--my-red) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-red);
+                            "
+                            id="physical_talents_btn">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0 align-items-center">
+                                <span class="custom-icon icon-ge my-red my-1 mx-2"></span>
+                                Körpertalente 
+                            </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
+                    
+                    <!-- Gesellschaftstalente -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text my-teal text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--my-teal) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-teal);
+                            "
+                            id="social_talents_btn">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex mb-0 align-items-center justify-content-center">
+                                <i class="bi bi-people fs-2 my-text my-teal mx-2" style="width: 46px;"></i> 
+                                Gesellschaftstalente 
+                            </div>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
+
+                    <!-- Naturtalente -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text my-green text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--my-green) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-green);
+                            "
+                            id="nature_talents_btn">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0 align-items-center">
+                                <span class="custom-icon icon-nature my-green my-1 mx-2"></span>
+                                Naturtalente 
+                            </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
+
+                    <!-- Wissenstalente -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text my-purple text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--my-purple) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-purple);
+                            "
+                            id="knowledge_talents_btn">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0 align-items-center">
+                                <span class="custom-icon icon-brain my-purple my-1 mx-2"></span>
+                                Wissenstalente 
+                            </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
+
+                    <!-- Handwerkstalente -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text my-orange text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--my-orange) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-orange);
+                            "
+                            id="crafting_talents_btn">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0 align-items-center">
+                                <span class="custom-icon icon-tool my-orange my-1 mx-2"></span>
+                                Handwerkstalente 
+                            </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
+
+                </div>
+
+
+                <!-- Talent list -->
+                <div id="talent_selection" class="d-flex flex-column gap-2 d-none">
+
+                    <h6 id="chosen_talent_category"></h6>
+
+                    <label for="talent_list" class="text-body-secondary small">
+                        wähle ein Talent
+                    </label>
+
+                    <div id="talent_list" class="d-flex flex-column gap-2"></div>
+
+                    <button class="btn btn-sm btn-outline-secondary" id="backToTalentCategorySelection" type="button">
+                        <i class="bi bi-arrow-bar-left me-1"></i> Zurück
+                    </button>
+
+                </div>
+
+
+
+                <!-- Talent Check -->
+                <div id="talent_check" class="d-flex flex-column gap-2 d-none">
+
+                    <h4 id="checked_talent"></h4>
+
+                    <!-- manuel modifier input -->
+                    <div class="d-flex flex-row gap-2">
+                        <span class="flex-grow-1 text-nowrap">Manueller Modifikator</span>
+                        <input id="modifierInput" type="number" class="form-control form-control-sm flex-grow-1" value="0">
+                    </div>
+
+                    <!-- Modifier by status effects -->
+                    <div class="d-flex align-items-center mb-0 flex-wrap">
+                        <span class="text-white mb-0 me-1">Modifikator durch Zustände</span>  
+                        <!-- number of status effects -->
+                        <span class="text-body-secondary mb-0 me-5" id="number_of_status_effects">(0)</span> 
+                        <!-- total status effect modifier -->
+                        <span class="fw-bold ms-5 mb-0 my-text my-red" id="status_effect_modifier">0</span> 
+
+
+                        <!-- Toggle fluff -->
+                        <button
+                            class="btn btn-sm btn-outline-secondary border-0 ms-auto py-0 px-1 mb-0"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#status_effect_modifier_list"
+                            aria-expanded="false"
+                            aria-controls="status_effect_modifier_list"
+                            id="status_effect_modifier_list_dropdown">
+
+                            <i class="bi bi-caret-down-fill"></i>
+                        </button>
+                        
+                    </div>
+
+                    <!-- collapsible information about statud effects -->
+                    <div class="collapse my-0" id="status_effect_modifier_list">
+                        <div class="card card-body bg-body-tertiary border-0 mt-0 py-1">
+                            <div class="d-flex flex-row justify-content-between">
+                                <div id="status_effect_info_column"></div>
+                                <div id="status_effect_modifier_column"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- overview card with atributes and rolls -->
+                    <div class="card card-body bg-body-secondary border-0 p-2 rounded-3 mb-2">
+                        <div class="row g-2">
+
+                            <!-- first attribute -->
+                            <div class="col-3 d-flex flex-column align-items-center">
+
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <i class="custom-icon icon-mu" 
+                                        style="width: 24px; height: 24px;"
+                                        id="icon_attribute1">
+                                    </i>
+                                    <small class="small text-secondary" id="attribute1_name">MU</small>
+                                </div>
+
+                                <div class="my-text fs-2 fw-bold" id="attribute1_value">14</div>
+
+                                <div class="position-relative" style="width: 64px; height: 64px;">
+                                    <div 
+                                        id = "roll1_background"
+                                        class="custom-icon icon-d20"
+                                        style="background-color: color-mix(in srgb, white 20%,var(--bs-tertiary-bg));
+                                            width: 64px; height: 64px;"
+                                    ></div> 
+                                    <span 
+                                        class="position-absolute top-50 start-50 translate-middle fs-2 fw-bold d-none"
+                                        id="attribute1_roll">
+                                        20
+                                    </span>
+                                    <span 
+                                        class="position-absolute fs-6"
+                                        style="bottom: 70%; left: 75%"
+                                        id="mod1">
+                                        -5
+                                    </span>
+                                </div>
+
+                            </div>
+
+                            <!-- second atribute -->
+                            <div class="col-3 d-flex flex-column align-items-center">
+
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <i class="custom-icon icon-mu" 
+                                        style="width: 24px; height: 24px;"
+                                        id="icon_attribute2">
+                                    </i>
+                                    <small class="small text-secondary" id="attribute2_name">MU</small>
+                                </div>
+
+                                <div class="my-text fs-2 fw-bold" id="attribute2_value">14</div>
+
+                                <div class="position-relative" style="width: 64px; height: 64px;">
+                                    <div 
+                                        id = "roll2_background"
+                                        class="custom-icon icon-d20"
+                                        style="background-color: color-mix(in srgb, white 20%,var(--bs-tertiary-bg));
+                                            width: 64px; height: 64px;"
+                                    ></div> 
+                                    <span 
+                                        class="position-absolute top-50 start-50 translate-middle fs-2 fw-bold d-none"
+                                        id="attribute2_roll">
+                                        20
+                                    </span>
+
+                                    <span 
+                                        class="position-absolute fs-6"
+                                        style="bottom: 70%; left: 75%"
+                                        id="mod2">
+                                        -5
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- third attribute -->
+                            <div class="col-3 d-flex flex-column align-items-center border-end border-secondary">
+
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <i class="custom-icon icon-mu" 
+                                        style="width: 24px; height: 24px;"
+                                        id="icon_attribute3">
+                                    </i>
+                                    <small class="small text-secondary" id="attribute3_name">MU</small>
+                                </div>
+
+                                <div class="my-text fs-2 fw-bold" id="attribute3_value">14</div>
+
+                                <div class="position-relative" style="width: 64px; height: 64px;">
+                                    <div 
+                                        id = "roll3_background"
+                                        class="custom-icon icon-d20"
+                                        style="background-color: color-mix(in srgb, white 20%,var(--bs-tertiary-bg));
+                                            width: 64px; height: 64px;"
+                                    ></div> 
+                                    <span 
+                                        class="position-absolute top-50 start-50 translate-middle fs-2 fw-bold d-none"
+                                        id="attribute3_roll">
+                                        20
+                                    </span>
+                                    <span 
+                                        class="position-absolute fs-6"
+                                        style="bottom: 70%; left: 75%"
+                                        id="mod3">
+                                        -5
+                                    </span>
+                                </div>
+                            </div>
+
+
+                            <!-- ability value and netto roll result -->
+                            <div class="col-3 d-flex flex-column align-items-center gap-1">
+
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <span class="small text-secondary">FW</span>
+                                </div>
+
+                                <div class="fs-2 fw-bold" id="talent_FW">10</div>
+
+                                <div class="position-relative my-1" style="width: 40px; height: 40px;">
+                                    <span 
+                                        class="position-absolute top-50 start-50 translate-middle fs-2 fw-bold d-none"
+                                        id="roll_diff">
+                                        20
+                                    </span>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <!-- ROLL RESULT -->
+                    <div class="row g-2 d-none" id="talent_check_result_section">
+
+                        <div class="col-9 d-flex flex-column align-items-center justify-content-center">
+
+                            <div class="position-relative" style="width: 128px; height: 128px;">
+                                <div 
+                                    id = "roll_result_icon"
+                                    style="background-color: color-mix(in srgb, white 20%,var(--bs-tertiary-bg));
+                                        width: 128px; height: 128px;"
+                                ></div> 
+                                <span 
+                                    class="position-absolute start-50 translate-middle-x fw-bold text-center text-nowrap"
+                                    id="QS_reached">
+                                    20
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="col-3 d-flex flex-column align-items-center justify-content-center">
+                            <span class="small text-secondary">FP</span>
+                            <div class="fs-2 fw-bold" id="fp_left"></div>
+                        </div>
+                    </div>
+
+                    <!-- Roll Button -->
+                    <button class="btn btn-outline-primary" id="roll_talent_btn" type="button">
+                        <span class="custom-icon icon-d20" style="background-color: white; width: 32px;"></span>  
+                        Roll
+                    </button>
+
+                    <button class="btn btn-sm btn-outline-secondary" id="backToTalentSelection" type="button">
+                        <i class="bi bi-arrow-bar-left me-1"></i> Zurück
+                    </button>
+
+                </div>
+
+            </div> <!-- end body -->
+
+        </div> <!-- end content -->
+    </div> <!-- end dialog -->
+</div> <!-- end modal -->

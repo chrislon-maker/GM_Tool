@@ -1,9 +1,8 @@
 from __future__ import annotations  # treat type hints as strings
 from typing import TYPE_CHECKING
 
-# import classes for type checking
-#if TYPE_CHECKING:
-#    from models.properties import Parry
+if TYPE_CHECKING:
+    from models.creature import Creature
 
 from models.enums import *
 
@@ -18,6 +17,7 @@ class Counter:
     Holds an integer which can be increased and decreases
     '''
     def __init__(self, value: int = 0):
+        self.initial = value
         self.value = value
 
     def set_to(self, value: int = 0):
@@ -29,11 +29,13 @@ class Counter:
     def decrease(self, amount: int = 1):
         self.value -= amount
 
+    def reset(self):
+        self.value = self.initial
+
 
 class RoundCounter(Counter):
     def tick_round(self):
         self.increase()
-
 
 
 @dataclass
@@ -95,9 +97,9 @@ class ValueCondition(ConditionCheck):
 class DependentCondition(ConditionCheck):
     '''
     Validity depents on validity of an other object
-    Call:   DependentCondition(myarmor.is_worn)    for normal method
+    Call:   DependentCondition(lambda: myarmor.is_worn)    for bool variable
     Call:   DependentCondition(lambda: myarmor.is_worn)    for @property
-    Call:   DependentCondition(lambda: creature.LeP.current < 0.75*creature.LeP.maximum)   
+    Call:   DependentCondition(lambda value=given_value: creature.LeP.current < value)   
     '''
 
     def __init__(self, dependence: Callable[[], bool]):
@@ -113,6 +115,8 @@ class DependentCondition(ConditionCheck):
 class ValueModifier:
     '''
     Handels a modifier that can be applied to a value
+    For derived values <additive> is added to it
+    For talent checks <additive> is added to the attribute
     '''
     additive: int = 0
     multiplicative: float = 1.0
@@ -139,7 +143,7 @@ class ModifierContribution:
     modifier: ValueModifier
     source_name: str
     source: object | None = None
-    description: str | None = None
+    level: int | None = None
 
 
 @dataclass(frozen=True)
@@ -148,16 +152,16 @@ class ModifierQuery:
     Holds all information about the value which is to be modified.
     Used e.g. by the StatusEffect classes which require these information to calculate the correct ValueModifier 
     '''
-    value_type: ValueType   # value to be modified
+    value_type: ValueId   # value to be modified
     actor: Creature         # creature that value belongs to
     tags: frozenset[ModifierTag] = frozenset()  # general tags and categories
     subject: object | None = None       # Talent, Weapon usw. 
     context: object | None = None       # context
 
 
+# values that are derived from stats and affected by status effects
 class DerivedValue:
-    name: str = ""
-    value_type: ValueType | None = None
+    name: ValueId | None = None
     maximum: int | float = float("inf")
     minimum: int | float = -float("inf")
 
@@ -176,23 +180,9 @@ class DerivedValue:
     def calculate(self):
         return 0
     
-    @property
-    def standard_query(self) -> ModifierQuery:
-        from .status_effect import ModifierQuery
-        if self.value_type is None:
-            raise ValueError(
-                f"{type(self).__name__} besitzt keinen ValueType."
-            )
-        
-        return ModifierQuery(
-            value_type = self.value_type,
-            actor =  self.creature,  
-            subject = self
-        )
 
-    def modifications(self, query: ModifierQuery | None = None) -> list[ModifierContribution]:
-        query = query or self.standard_query
-        return StatusModifierResolver.resolve(query)
+    def modifications(self) -> list[ModifierContribution]:
+        return StatusModifierResolver.resolve(self.creature, self)
     
     @property
     def current(self):
@@ -201,4 +191,27 @@ class DerivedValue:
             modifier = modifier.combine(contribution.modifier)
         return modifier.apply(self.base)
 
-    
+
+class StatusModifierResolver:
+    '''
+    Collects the ModifierContributions of all StatusEffect instances into a list 
+    '''
+    @staticmethod
+    def resolve(creature, target) -> list[ModifierContribution]:
+
+        contributions: list[ModifierContribution] = []
+
+        for effect in creature.status_effects.values():
+            modifier = effect.get_modifier(target)
+
+            if not modifier.is_neutral:
+                contributions.append(
+                    ModifierContribution(
+                    modifier = modifier,
+                    source_name = effect.name,
+                    source = effect,
+                    level = effect.level
+                    )
+                )
+
+        return contributions

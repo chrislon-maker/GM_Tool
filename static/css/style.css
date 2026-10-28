@@ -7,6 +7,10 @@
     min-height: 0;
     }
 
+.my-border {
+    border-color: var(--my-color) !important;
+}
+
 .character-button {
     --bs-btn-bg: transparent;
     --bs-btn-color: #adb5bd;
@@ -76,6 +80,17 @@
 .my-orange   { --my-color: var(--my-orange); }
 .my-red  { --my-color: var(--my-red); }
 
+
+/* Color selection */
+.color-mu { --my-color: var(--my-yellow); }
+.color-kl   { --my-color: var(--my-purple); }
+.color-in  { --my-color: var(--my-blue); }
+.color-ch { --my-color: var(--my-pink); }
+.color-ff   { --my-color: var(--my-teal); }
+.color-ge  { --my-color: var(--my-green); }
+.color-ko   { --my-color: var(--my-orange); }
+.color-kk  { --my-color: var(--my-red); }
+
 /* Weitere Farben entsprechend */
 
 /* Color application */
@@ -84,6 +99,8 @@
 .my-border { border-color: var(--my-color); }
 
 .advantage-item {
+    min-height: 24px;
+    align-items: center;
     background-color: color-mix(
         in srgb,
         var(--my-green) 18%,
@@ -100,6 +117,8 @@
 }
 
 .disadvantage-item {
+    min-height: 24px;
+    align-items: center;
     background-color: color-mix(
         in srgb,
         var(--my-red) 18%,
@@ -162,4 +181,192 @@ body {
 .attribute-card .attribute-icon,
 .attribute-card .attribute-value {
     color: var(--attribute-color);
+}
+
+
+/* SLIDER */
+.resource-slider-container {
+    position: relative;
+    width: 100%;
+    height: 12px;
+}
+
+.resource-slider {
+    --slider-color: var(--my-green);
+    --slider-percent: 100%;
+
+    appearance: none;
+    -webkit-appearance: none;
+    display: block;
+    width: 100%;
+    height: 12px;
+    margin: 0;
+    border-radius: 999px;
+    cursor: pointer;
+
+    background: linear-gradient(
+        to right,
+        var(--slider-color) 0%,
+        var(--slider-color) var(--slider-percent),
+        var(--bs-secondary-bg) var(--slider-percent),
+        var(--bs-secondary-bg) 100%
+    );
+}
+
+/* Chrome, Edge, Safari */
+.resource-slider::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    cursor: grab;
+}
+
+/* Firefox */
+.resource-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    cursor: grab;
+}
+
+/* Markierungen */
+.resource-slider-marker {
+    position: absolute;
+    top: -0px;
+    height: 12px;
+    width: 2px;
+    background: white;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+
+/* icons */
+.custom-icon {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+
+    vertical-align: middle;
+
+    background-color: var(--my-color);
+    mask-size: contain;
+    mask-position: center;
+    mask-repeat: no-repeat;
+
+}
+
+.icon-kk {
+    mask-image: url("/static/icons/KK_icon.svg");
+}
+
+.icon-mu {
+    mask-image: url("/static/icons/MU_icon.svg");
+}
+
+.icon-kl {
+    mask-image: url("/static/icons/KL_icon.svg");
+}
+
+.icon-in {
+    mask-image: url("/static/icons/IN_icon.svg");
+}
+
+.icon-ko {
+    mask-image: url("/static/icons/KO_icon.svg");
+}
+
+.icon-ch {
+    mask-image: url("/static/icons/CH_icon.svg");
+}
+
+.icon-ff {
+    mask-image: url("/static/icons/FF_icon.svg");
+}
+
+.icon-ge {
+    mask-image: url("/static/icons/GE_icon.svg");
+}
+
+.icon-brain {
+    mask-image: url("/static/icons/brain_icon.svg");
+}
+
+.icon-egg {
+    mask-image: url("/static/icons/egg_broken_icon.svg");
+}
+
+.icon-soul {
+    mask-image: url("/static/icons/soul_icon.svg");
+}
+
+.icon-soul-fill {
+    mask-image: url("/static/icons/soul_filled_icon.svg");
+}
+
+.icon-accelerate {
+    mask-image: url("/static/icons/accelerate_icon.svg");
+}
+
+.icon-run-fill {
+    mask-image: url("/static/icons/run_icon_fill.svg");
+}
+
+.icon-run {
+    mask-image: url("/static/icons/run_icon.svg");
+}
+
+.icon-sword {
+    mask-image: url("/static/icons/sword_icon.svg");
+}
+
+.icon-die {
+    mask-image: url("/static/icons/die_icon.svg");
+}
+
+.icon-nature {
+    mask-image: url("/static/icons/nature_icon.svg");
+}
+
+.icon-tool {
+    mask-image: url("/static/icons/tool_icon.svg");
+}
+
+.icon-d20 {
+    mask-image: url("/static/icons/d20_icon.svg");
+}
+
+.icon-medal {
+    mask-image: url("/static/icons/medal_icon.svg");
+}
+
+.icon-alert {
+    mask-image: url("/static/icons/alert_icon.svg");
+}
+
+.icon-pain {
+    mask-image: url("/static/icons/pain_icon.svg");
+}
+
+.icon-pain2 {
+    mask-image: url("/static/icons/pain2_icon.svg");
+}
+
+.icon-snow {
+    mask-image: url("/static/icons/snow_icon.svg");
+}
+
+.icon-stars {
+    mask-image: url("/static/icons/stars_icon.svg");
+}
+
+.icon-fear {
+    mask-image: url("/static/icons/fear_icon.svg");
 }

@@ -26,6 +26,24 @@
 
 
 <body class="d-flex flex-column vh-100">
+
+    <div id="loadingOverlay"
+        class="position-fixed top-0 start-0 w-100 h-100
+                d-flex flex-column align-items-center
+                justify-content-center gap-3"
+        style="
+            background: var(--bs-body-bg);
+            z-index: 9999;
+        ">
+
+        <div class="spinner-border text-primary"
+            role="status">
+        </div>
+
+        <span>PDF-Dateien werden geladen...</span>
+    </div>
+
+
     <div class="row px-3 mt-2">
         <h4>DSA GM-Tool</h4>
     </div>
@@ -51,19 +69,22 @@
                     <!-- horizontal rule -->
                     <hr class="mb-2 mt-0">
 
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex flex-row justify-content-between align-items-center mb-2">
 
                         <h6 class="text-body-secondary mb-0">
                             CHARAKTERE
                         </h6>
 
                         <button type="button"
-                                class="btn btn-sm btn-outline-secondary border-0"
+                                class="btn btn-sm btn-outline-secondary border-0 
+                                 d-inline-flex align-items-center justify-content-center
+                                 p-0 mb-1"
+                                style="width: 22px; height: 22px; --bs-btn-hover-bg: var(--bs-secondary-bg)"
                                 data-bs-toggle="modal"
                                 data-bs-target="#addCharacterModal"
                                 title="Charakter hinzufügen"
                                 aria-label="Charakter hinzufügen">
-                            <i class="bi bi-plus-square"></i>
+                            <i class="bi bi-plus" style="font-size: 24px;"></i>
                         </button>
 
                     </div>
@@ -119,7 +140,7 @@
                         <h6 class="text-body-secondary mb-2">EVENTS</h6>
 
                         <div class="card bg-body-tertiary p-3 rounded-1 border-0 flex-grow-1 scroll-panel">
-                            <p>Keine Events</p>
+                            <p class="text-secondary">Keine Events</p>
                         </div>
                     </section>
 
@@ -133,7 +154,7 @@
                         <h6 class="text-body-secondary mb-2">LOG</h6>
 
                         <div class="card bg-body-tertiary p-3 rounded-1 border-0 flex-grow-1 scroll-panel">
-                            <p>Keine Aktionen</p>
+                            <p class="text-secondary">Keine Aktionen</p>
                         </div>
                     </section>
 
@@ -147,6 +168,10 @@
 
 {% include "components/add_character_modal.html" %}
 
+{% include "components/add_status_effect_modal.html" %}
+
+{% include "components/talent_check_modal.html" %}
+
 
 <!-- bootstrap scripts --> 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
@@ -157,6 +182,20 @@
 
 <!-- character scripts --> 
 <script src="{{ url_for('static', filename='js/character_tableau.js') }}"></script>
+
+<script>
+    // LOAD ALL CHARACTERS ON OPENING PAGE
+    document.addEventListener("DOMContentLoaded", async () => {
+        const overlay = document.getElementById("loadingOverlay");
+
+        pdfFiles = await loadAvailablePDFs();
+        for (const filename of pdfFiles) {
+            await addCharacter(filename);
+        }
+
+        overlay.remove();
+    });
+</script>
 
 
 </body>

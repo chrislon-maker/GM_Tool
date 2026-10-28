@@ -87,7 +87,14 @@ class SizeCategory(IntEnum):
         }[self]
 
 
-class TalentTag(Enum):
+class TalentTypes(Enum):
+    PHYSICAL_TALENT = "Körpertalent"
+    NATURE_TALENT = "Naturtalent"
+    SOCIAL_TALENT = "Gesellschaftstalent"
+    KNOWLEDGE_TALENT = "Wissenstalent"
+    CRAFTING_TALENT = "Handwerkstalent"
+
+class TalentId(Enum):
     FLYING = "Fliegen"
     JUGGLING = "Gaukeleien"
     CLIMBING = "Klettern"
@@ -152,27 +159,23 @@ class TalentTag(Enum):
     STONE_MASONRY = "Steinbearbeitung"
     TAYLORING = "Stoffbearbeitung"
 
-class SpellTag(Enum):
-    IGNIFAXIUS = "Ignifaxius"
 
-class ValueType(Enum):
-    MOVEMENT_SPEED = auto()
-    SOUL_POWER = auto()
-    TOUGHNESS = auto()
-    INITIATIVE = auto()
-    EVASION = auto()
+class ValueId(Enum):
+    MOVEMENT_SPEED = "GS"
+    SOUL_POWER = "SK"
+    TOUGHNESS = "ZK"
+    INITIATIVE = "INI"
 
-    TALENT_CHECK = auto()
+    MELEE_ATTACK = "AT"
+    RANGED_ATTACK = "FK"
+    PARRY = "PA"
+    DODGE = "AW"
 
-    MELEE_ATTACK = auto()
-    RANGED_ATTACK = auto()
-    PARRY = auto()
-
-    DAMAGE = auto()
+    DAMAGE = "SP"
 
 
 class ModifierTag(Enum):
-    PHYSICAL = "physical"
+    PHYSICAL = "physisch"
     MENTAL = "mental"
     SOCIAL = "social"
     KNOWLEDGE = "knowledge"
@@ -185,8 +188,10 @@ class ModifierTag(Enum):
     RANGED = "ranged"
 
     MOVEMENT = "movement"
-    ENCUMBRANCE = "encumbrance"
     SPEECH = "speech"
-    CRAFT = "craft"
     NATURE = "nature"
     CONCENTRATION = "concentration"
+    ENCUMBRANCE = "encumbrance"
+
+class SpellTag(Enum):
+    IGNIFAXIUS = "Ignifaxius"

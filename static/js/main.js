@@ -1,5 +1,6 @@
 
 // CHARACTER SELECTION
+
 // character list
 const characterList = document.getElementById("characterList")
 
@@ -7,7 +8,6 @@ characterList.addEventListener("click", async (event) => {
 
     // CASE 1 : delete character
 
-    // which button was pressed?
     const deleteButton = event.target.closest(".delete-character")
 
     // abbort if no button was clicked
@@ -62,12 +62,13 @@ characterList.addEventListener("click", async (event) => {
 
 // CHARACTER IMPORT
 
-// get modal
+// modal for character import
 const addCharacterModal = document.getElementById("addCharacterModal");
 
-// get contents
+// Import selection method window
 const ImportMethodSelection = document.getElementById("characterImportMethodSelection");
 
+// Import form PDF window
 const CharacterPdfSelection = document.getElementById("characterPDFSelection");
 //const ManuelCharacterForm = document.getElementById("manuelCharacterForm");
 //const CharacterLinkInput = document.getElementById("characterLinkInput");
@@ -80,11 +81,24 @@ const characterPDFDropdown = document.getElementById("characterPDF");
 const characterPDFUpload = document.getElementById("characterPDFUpload"); 
 
 // load "import from PDF" - page
-AddFromPDFButton.addEventListener("click", () => {
+AddFromPDFButton.addEventListener("click", async () => {
     ImportMethodSelection.classList.add("d-none");
     CharacterPdfSelection.classList.remove("d-none");
 
-    loadAvailablePDFs();
+    pdfFiles = await loadAvailablePDFs();
+
+    // replace the content of the drop down menue by this HTML
+    characterPDFDropdown.innerHTML = '<option value="">Bitte auswählen...</option>';
+
+    // create <option> objects and add them to the drop down
+    pdfFiles.forEach(filename => {
+        const option = document.createElement("option");
+
+        option.value = filename;
+        option.textContent = filename;
+
+        characterPDFDropdown.appendChild(option);
+    });
 });
 
 // go back to method selection page
@@ -107,18 +121,7 @@ async function loadAvailablePDFs() {
     // get file names form json
     const pdfFiles = await response.json();
 
-    // replace the content of the drop down menue by this HTML
-    characterPDFDropdown.innerHTML = '<option value="">Bitte auswählen...</option>';
-
-    // create <option> objects and add them to the drop down
-    pdfFiles.forEach(filename => {
-        const option = document.createElement("option");
-
-        option.value = filename;
-        option.textContent = filename;
-
-        characterPDFDropdown.appendChild(option)
-    });
+    return pdfFiles;
 }
 
 // reset PDF dropwodn when PDF is searched for by path
@@ -135,10 +138,9 @@ characterPDFDropdown.addEventListener("change", () => {
     }
 });
 
-
-async function addCharacter() {
-
-    // get file name form drop wodn
+// send loading request for character PDF
+ImportCharacterFromPDFButton.addEventListener("click", () => {
+    // get file name form drop down
     const filename = characterPDFDropdown.value
 
     // check if it is empty
@@ -146,6 +148,18 @@ async function addCharacter() {
         alert("Bitte wähle zuerst eine PDF aus.");
         return;
     }
+
+    addCharacter(filename);
+
+    // Modal schließen
+    const modalElement = document.getElementById("addCharacterModal");
+    const modal = bootstrap.Modal.getInstance(modalElement);
+
+    modal.hide();
+});
+
+// adds a character to the character list
+async function addCharacter(filename) {
 
     // call add_character() function and send data
     try {
@@ -186,7 +200,6 @@ async function addCharacter() {
         ch_button.appendChild(arrow_icon);
         ch_button.appendChild(document.createTextNode(result.character.name));
 
-
         // delete button
         const del_icon = document.createElement("i");
         del_icon.className = "bi bi-x-lg";
@@ -202,17 +215,10 @@ async function addCharacter() {
 
         // CONTINUE HERE ADD DELETE FUNCTION TO DELETE BUTTON
 
-
         characterList.appendChild(row) ;
 
         // add message to console log
         console.log("Charakter geladen:", result.character.name);
-
-        // 8. Modal schließen
-        const modalElement = document.getElementById("addCharacterModal");
-        const modal = bootstrap.Modal.getInstance(modalElement);
-
-        modal.hide();
 
     } catch (error) {
         console.error("Fehler beim Import:", error);
@@ -221,6 +227,8 @@ async function addCharacter() {
     
 };
 
+
+// delece a character form the character list
 async function deleteCharacter(char_id) {
 
     // call delete_character() function and send data
@@ -249,6 +257,3 @@ async function deleteCharacter(char_id) {
         return false;
     }
 };
-
-// send loading request for character PDF
-ImportCharacterFromPDFButton.addEventListener("click", addCharacter);

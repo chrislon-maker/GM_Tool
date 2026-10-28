@@ -5,6 +5,7 @@ from models.properties import Resource, DerivedValue, Attribute
 from models.equipment import Weapon, Armor, DamageType, Damage
 from models.status_effect import StatusEffect, ConditionCheck, Pain
 from models.modifiers import DependentCondition, Counter
+from models.enums import Attribute, TalentId
 
 import numpy as np
 
@@ -34,8 +35,8 @@ class CreatureBase:
     source: str | None = None
     source_url: str | None = None
 
-    attributes: dict[str, int] = field(default_factory=dict)
-    talents: dict[str, int] = field(default_factory=dict)
+    attributes: dict[Attribute, int] = field(default_factory=dict)
+    talents: dict[TalentId, int] = field(default_factory=dict)
     weapon_skills: dict[str, int] = field(default_factory=dict)
 
     LeP: Resource = field(default_factory=lambda: Resource(0))
@@ -79,6 +80,10 @@ class Creature(CreatureBase):
         # Consider changing this to adding multiple identical removal_conditions instead
         for i in range(level):
             self.status_effects[status_type].removal_conditions.append(removal_condition)
+
+    def status_level(self, status_type: type[StatusEffect]) -> int:
+        effect = self.status_effects.get(status_type)
+        return effect.level if effect is not None else 0
         
     def remove_invalid_status_effects(self) -> None:
         self.status_effects = [
@@ -131,7 +136,7 @@ class Creature(CreatureBase):
             5,
         ])
     
-    def get_damage(self, damage: Damage) -> None:
+    def get_damage(self, amount: int) -> None:
         pain_markers = self.pain_markers()
 
         # check which pain level was present before damage received
@@ -140,12 +145,13 @@ class Creature(CreatureBase):
             if self.LeP.current < marker
         }
 
+        # MOVE TO ATTACK HANDLER
         # reduce damage by armor
-        for armor in self.armor:
-            damage = armor.reduce(damage)
+        #for armor in self.armor:
+        #    damage = armor.reduce(damage)
 
-        # reduce LeP by the amount of unblocked damage
-        self.LeP.decrease(damage.amount)
+        # reduce LeP by the amount
+        self.LeP.decrease(amount)
 
         # check which pain level was present before damage received
         after = {
@@ -164,8 +170,8 @@ class Creature(CreatureBase):
 
     def heal(self, amount: int) -> None:
         self.LeP.increase(amount)
-        if Pain in self.status_effects:
-            Pain.update()
+        if Pain in self.status_effects.keys():
+            self.status_effects[Pain].update()
 
     def status_update(self) -> dict[str, int]:
         output = {}
@@ -173,6 +179,8 @@ class Creature(CreatureBase):
             output[status.name] = status.level
         return output
 
+    def get_relevant_attributes(self, TalentDefinition) -> list[tuple[Attribute, int]]:
+        return [(attribute, self.attributes[attribute]) for attribute in TalentDefinition.attributes]
 
 
 

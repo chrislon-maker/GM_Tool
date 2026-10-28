@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 from models.status_effect import Encumbrance
 from models.modifiers import DependentCondition
 from models.properties import Attribute
-from models.enums import WeaponType, ValueType, MeleeWeaponRange, WhereEquipped, ShieldSize
+from models.enums import WeaponType, ValueId, MeleeWeaponRange, WhereEquipped, ShieldSize
 
 from dataclasses import dataclass, field
 import re, random
@@ -66,7 +66,7 @@ class Weapon:
 
 @dataclass
 class MeleeWeapon(Weapon):
-    attack_type: ValueType = ValueType.MELEE_ATTACK
+    attack_type: ValueId = ValueId.MELEE_ATTACK
 
     attack_modifier: int = 0
     parry_modifier: int = 0
@@ -90,7 +90,7 @@ class RangedWeapon(Weapon):
     range: list[int] = field(default_factory=list)
     munition: str | None = None
 
-    attack_type: ValueType = ValueType.RANGED_ATTACK
+    attack_type: ValueId = ValueId.RANGED_ATTACK
     
 
 
