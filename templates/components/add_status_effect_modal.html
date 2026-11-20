@@ -22,28 +22,131 @@
             <div class="modal-body">
 
                 <!-- import method selection window -->
-                <div class="d-flex flex-column gap-2">
+                <div id="status_effect_selection_window" class="d-flex flex-column gap-2">
+
                     <p class="text-body-secondary small mb-3">
-                        Füge einen Statuseffekt hinzu...
+                        Welcher Zustand?
                     </p>
+    
+                    <!-- Schmerz -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text my-red text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--my-red) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-red);
+                            "
+                            id="add_pain_btn">
 
-                    <div class="d-flex justify-content-between align-items-center gap-2">
-                        <span class="custom-icon icon-pain my-red" style="width: 24px; height: 24px;"></span>
-                        <span>Schmerz</span>
-                        <input id="pain_input" type="number" class="form-control form-control-sm flex-grow-1" value="0">
-                    </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0 align-items-center">
+                                <span class="custom-icon icon-pain my-red my-1 mx-2"></span>
+                                Schmerz 
+                            </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
+                    
+                    <!-- Paralyse -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text my-teal text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--my-teal) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-teal);
+                            "
+                            id="add_paralysis_btn">
 
-                    <div class="d-flex justify-content-between align-items-center gap-2">
-                        <span class="custom-icon icon-snow my-teal" style="width: 24px; height: 24px;"></span>
-                        <span>Paralyse</span>
-                        <input id="pain_input" type="number" class="form-control form-control-sm flex-grow-1" value="0">
-                    </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex mb-0 align-items-center justify-content-center">
+                                <span class="custom-icon icon-snow my-teal my-1 mx-2"></span> 
+                                Paralyse 
+                            </div>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
 
-                    <div class="d-flex justify-content-between align-items-center gap-2">
-                        <span class="custom-icon icon-stars my-yellow" style="width: 24px; height: 24px;"></span>
-                        <span>Verwirrung</span>
-                        <input id="pain_input" type="number" class="form-control form-control-sm flex-grow-1" value="0">
-                    </div>
+                    <!-- Furcht -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text my-purple text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--my-purple) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-purple);
+                            "
+                            id="add_fear_btn">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0 align-items-center">
+                                <span class="custom-icon icon-fear my-purple my-1 mx-2"></span>
+                                Furcht 
+                            </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
+
+                    <!-- Verwirrung -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text my-yellow text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--my-yellow) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-yellow);
+                            "
+                            id="add_confusion_btn">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0 align-items-center">
+                                <span class="custom-icon icon-stars my-yellow my-1 mx-2"></span>
+                                Verwirrung 
+                            </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
+
+                    <!-- Belastung -->
+                    <button type="button"
+                            class="btn btn-outline-secondary my-border my-text text-body-secondary text-start p-3"
+                            style="
+                                --bs-btn-hover-bg: color-mix(
+                                    in srgb,
+                                    var(--text-body-secondary) 15%,
+                                    var(--bs-tertiary-bg)
+                                );
+                                --bs-btn-hover-color: white;
+                                --bs-btn-hover-border-color: var(--my-orange);
+                            "
+                            id="add_encumbrance_btn">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-0 align-items-center">
+                                <span class="custom-icon icon-weight my-1 mx-2" style="background-color: var(--bs-secondary-color);"></span>
+                                Belastung 
+                            </p>
+                            
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </button>
 
                 </div>
 

@@ -370,3 +370,7 @@ body {
 .icon-fear {
     mask-image: url("/static/icons/fear_icon.svg");
 }
+
+.icon-weight {
+    mask-image: url("/static/icons/weight_icon.svg");
+}
